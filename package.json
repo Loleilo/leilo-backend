@@ -1,0 +1,20 @@
+{
+  "name": "leilo-backend",
+  "version": "1.0.0",
+  "description": "The backend to the Leilo project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sunny",
+  "license": "ISC",
+  "dependencies": {
+    "deep-assign": "latest",
+    "eventemitter2": "^4.1.2",
+    "eventemitterchain2": "latest",
+    "obj-perms-engine": "^2.3.0",
+    "object-path": "latest",
+    "password-hash": "latest",
+    "ws": "^3.1.0"
+  }
+}
