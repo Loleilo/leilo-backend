@@ -19,14 +19,7 @@ class Engine extends EventEmitter2 {
 
         // const actualSuper = super;
         //handles events for middleware (aka before actual event is run)
-        this.pendingEmitter = new EventEmitterChain2(defaultConf,  (...args)=> {
-            super.emit(...args, {
-                src: this.event[1],
-                dst: this.event[2],
-                name: this.event[0], //event name
-                params: this.event.slice(3), //event params
-            });
-        });
+        this.pendingEmitter = new EventEmitterChain2(defaultConf, (...args) => super.emit(...args));
 
 
         //todo not sure if this is needed
@@ -38,29 +31,23 @@ class Engine extends EventEmitter2 {
     }
 
     _createHandler(callback) {
-        const engine = this;
-        return function (next, payload, src, dst) {
+        return (next, payload, evt) => {
             try {
                 callback(
-                    engine.state,
+                    this.state,
                     //wrap next function with a nextState parameter that allows middleware to modify state
                     (nextState) => {
-                        engine.state = nextState;
+                        this.state = nextState;
                         next();
                     },
                     payload,
-                    engine,
-                    {
-                        src: src,
-                        dst: dst,
-                        name: this.event[0], //event name
-                        params: this.event.slice(3), //event params
-                    }
+                    this,
+                    evt
                 )
             } catch (e) {
-                engine.emit(['error_occurred', serverID, src], {
+                this.emit(['error_occurred', serverID, evt.src], {
                     error: e,
-                    srcEvent: this.event
+                    srcEvent: evt
                 });
             }
         };
@@ -84,14 +71,19 @@ class Engine extends EventEmitter2 {
     }
 
     emit(evt, payload) {
-        if(Array.isArray(evt)) {
+        if (Array.isArray(evt)) {
             const defaultParams = [undefined, '*', '*'];
-            for (let i = 0; i < evt.length; i++)
+            for (let i = 0; i < defaultParams.length; i++)
                 if (evt[i] === undefined)
                     evt[i] = defaultParams[i];
         }
 
-        this.pendingEmitter.emit(evt, payload, evt[1], evt[2]);
+        this.pendingEmitter.emit(evt, payload, {
+            name: evt[0],
+            src: evt[1],
+            dst: evt[2],
+            params: evt.slice(3), //event params
+        });
     }
 
     emitAsync(...args) {

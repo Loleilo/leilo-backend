@@ -8,7 +8,7 @@ module.exports = (on) => {
         const wss = new WebSocket.Server({port: 80});
         wss.on('connection', (ws) => {
             ws.send(`try_auth ${config.version}`);
-            ws.once('message', (data) => {
+            ws.once('message', (data) => { //todo fix issue of this disconnecting
                 const msg = JSON.parse(data);
                 const successHandler = () => {
                     engine.removeListener(['auth_rejected', serverID, msg.username], rejectHandler);
@@ -21,18 +21,18 @@ module.exports = (on) => {
                         //wrapper emits client_disconnected when listener is called and ws is not open
                         const listenerWrapped = function (...args) {
                             if (ws.readyState !== WebSocket.OPEN)
-                                engine.emit(['client_disconnected', currClientID, '*']);
+                                engine.emit(['client_disconnected', currClientID, serverID]);
                             else listener.call(this, ...args);
                         };
 
                         //handler removes the listener
-                        engine.once(['client_disconnected', currClientID, currClientID], () => emitter.removeListener(event, listenerWrapped));
+                        engine.once(['client_disconnected', currClientID, serverID], () => emitter.removeListener(event, listenerWrapped));
 
                         emitter.on(event, listenerWrapped);
                     }
 
                     //emit disconnected also in explicit disconnect
-                    ws.once('disconnect', () => engine.emit(['client_disconnected', currClientID, '*']));
+                    ws.once('disconnect', () => engine.emit(['client_disconnected', currClientID, serverID]));
 
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {
@@ -42,7 +42,7 @@ module.exports = (on) => {
                     });
 
                     //pipe server messages to client
-                    autoDisconnectAddListener(engine, ['*', '*', currClientID], function (payload) {
+                    autoDisconnectAddListener(engine, ['*', '*', currClientID, '**'], function (payload) {
                         const msg = JSON.stringify({
                             type: this.event[0],
                             src: this.event[1],
@@ -58,7 +58,7 @@ module.exports = (on) => {
                     });
 
                     //send client connected event
-                    engine.emit('client_connected', undefined, currClientID);
+                    engine.emit(['client_connected', serverID, serverID], undefined, currClientID);
                 };
                 const rejectHandler = () => {
                     engine.removeListener(['auth_successful', serverID, msg.username], successHandler);

@@ -13,7 +13,7 @@ module.exports = (on) => {
         eng.u_updateUserLevel(serverID, state, eng.config.USER_LEVEL.ROOT);
 
         //expose functions that will be required by other modules in state
-        state.updatePerms = eng.updatePerms;
+        state.readPerms = eng.readPerms;
 
         next(state);
     });
