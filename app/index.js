@@ -1,4 +1,3 @@
-const clientHandler = require('./wsConnector');
 const Engine = require('./engine');
 const config = require('./config');
 
@@ -28,7 +27,7 @@ module.exports = () => {
     process.once('SIGINT', () => engine.emit(['server_exit', serverID, '*']));
     process.once('SIGUSR1', () => engine.emit(['server_exit', serverID, '*']));
     process.once('SIGUSR2', () => engine.emit(['server_exit', serverID, '*']));
-    process.once('uncaughtException', () => engine.emit(['server_exit', serverID, '*']));
+    // process.once('uncaughtException', () => engine.emit(['server_exit', serverID, '*']));
 
     engine.emit(["server_init", serverID, serverID]);
 

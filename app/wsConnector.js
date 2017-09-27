@@ -37,7 +37,8 @@ module.exports = (on) => {
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {
                         const msg = JSON.parse(message);
-                        engine.emit([msg.type, currClientID, msg.dst], msg.payload);
+                        console.log(msg);
+                        engine.emit([msg.type, currClientID, msg.dst, ...(msg.params || [])], msg.payload);
                     });
 
                     //pipe server messages to client
@@ -46,6 +47,7 @@ module.exports = (on) => {
                             type: this.event[0],
                             src: this.event[1],
                             payload: payload,
+                            params: this.event.slice(2),
                         });
                         ws.send(msg);
                     });

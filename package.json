@@ -12,10 +12,11 @@
     "deep-assign": "latest",
     "eventemitter2": "^4.1.2",
     "eventemitterchain2": "latest",
+    "jsonfile": "latest",
     "obj-perms-engine": "^2.3.0",
+    "object-assign-deep": "^0.3.1",
     "object-path": "latest",
     "password-hash": "latest",
-    "ws": "^3.1.0",
-    "jsonfile": "latest"
+    "ws": "^3.1.0"
   }
 }

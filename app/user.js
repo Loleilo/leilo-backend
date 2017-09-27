@@ -26,23 +26,24 @@ module.exports = (on) => {
         next(state);
     });
 
-    on(['change_password', '*', serverID], (state, next, payload, engine, src) => {
-        state.users[src] = {
+    on(['change_password', '*', serverID], (state, next, payload, engine, evt) => {
+        state.users[evt.src] = {
             passwordHash: PasswordHash.generate(payload.password)
         };
 
         next(state);
     });
 
-    on(['delete_user', '*', serverID], (state, next, payload, engine, src) => {
+    on(['delete_user', '*', serverID], (state, next, payload, engine, evt) => {
         //todo make sure to disconnect user on delete
-        state.users[src] = null;
+        state.users[evt.src] = null;
 
         next(state);
     });
 
-    on(['try_auth', '*', serverID], (state, next, payload, engine, src) => {
-        if(state.users[src]===undefined) {
+    on(['try_auth', '*', serverID], (state, next, payload, engine, evt) => {
+        const src = evt.src;
+        if (state.users[src] === undefined) {
             engine.emit(['auth_rejected', serverID, src]);
             return;
         }

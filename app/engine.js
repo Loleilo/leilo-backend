@@ -17,8 +17,16 @@ class Engine extends EventEmitter2 {
 
         this.state = initState;
 
+        // const actualSuper = super;
         //handles events for middleware (aka before actual event is run)
-        this.pendingEmitter = new EventEmitterChain2(defaultConf, (...args) => super.emit(...args));
+        this.pendingEmitter = new EventEmitterChain2(defaultConf,  (...args)=> {
+            super.emit(...args, {
+                src: this.event[1],
+                dst: this.event[2],
+                name: this.event[0], //event name
+                params: this.event.slice(3), //event params
+            });
+        });
 
 
         //todo not sure if this is needed
@@ -42,9 +50,12 @@ class Engine extends EventEmitter2 {
                     },
                     payload,
                     engine,
-                    src,
-                    dst,
-                    this.event[0]
+                    {
+                        src: src,
+                        dst: dst,
+                        name: this.event[0], //event name
+                        params: this.event.slice(3), //event params
+                    }
                 )
             } catch (e) {
                 engine.emit(['error_occurred', serverID, src], {
@@ -73,10 +84,12 @@ class Engine extends EventEmitter2 {
     }
 
     emit(evt, payload) {
-        const defaultParams = [undefined, '*', '*'];
-        for (let i = 0; i < evt.length; i++)
-            if (evt[i] !== undefined)
-                evt[i] = defaultParams[i];
+        if(Array.isArray(evt)) {
+            const defaultParams = [undefined, '*', '*'];
+            for (let i = 0; i < evt.length; i++)
+                if (evt[i] === undefined)
+                    evt[i] = defaultParams[i];
+        }
 
         this.pendingEmitter.emit(evt, payload, evt[1], evt[2]);
     }
