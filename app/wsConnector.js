@@ -6,12 +6,12 @@ const serverID = config.serverID;
 module.exports = (on) => {
     on(['server_init', serverID, serverID], (state, next, payload, engine) => {
         const wss = new WebSocket.Server({port: 80});
-
         wss.on('connection', (ws) => {
             ws.send(`try_auth ${config.version}`);
             ws.once('message', (data) => {
                 const msg = JSON.parse(data);
-                engine.once(['auth_successful', serverID, msg.username], () => {
+                const successHandler = () => {
+                    engine.removeListener(['auth_rejected', serverID, msg.username], rejectHandler);
                     ws.send(`auth_successful`);
                     const currClientID = msg.username;
                     console.log(`User @${currClientID} authenticated`);
@@ -26,10 +26,7 @@ module.exports = (on) => {
                         };
 
                         //handler removes the listener
-                        engine.once(['client_disconnected', currClientID, currClientID], (state, next) => {
-                            emitter.removeListener(event, listener);
-                            next(state);
-                        });
+                        engine.once(['client_disconnected', currClientID, currClientID], () => emitter.removeListener(event, listenerWrapped));
 
                         emitter.on(event, listenerWrapped);
                     }
@@ -60,11 +57,14 @@ module.exports = (on) => {
 
                     //send client connected event
                     engine.emit('client_connected', undefined, currClientID);
-                });
-                engine.once(['auth_rejected', serverID, msg.username], () => {
+                };
+                const rejectHandler = () => {
+                    engine.removeListener(['auth_successful', serverID, msg.username], successHandler);
                     ws.send(`auth_rejected`);
                     ws.close();
-                });
+                };
+                engine.once(['auth_successful', serverID, msg.username], successHandler);
+                engine.once(['auth_rejected', serverID, msg.username], rejectHandler);
                 engine.emit(['try_auth', msg.username, serverID], msg);
             });
         });

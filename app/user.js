@@ -42,7 +42,10 @@ module.exports = (on) => {
     });
 
     on(['try_auth', '*', serverID], (state, next, payload, engine, src) => {
-        if(state.users[src]===undefined)engine.emit(['auth_rejected', serverID, src]);
+        if(state.users[src]===undefined) {
+            engine.emit(['auth_rejected', serverID, src]);
+            return;
+        }
         if (PasswordHash.verify(payload.password, state.users[src].passwordHash))
             engine.emit(['auth_successful', serverID, src]);
         else

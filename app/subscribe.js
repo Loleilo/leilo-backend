@@ -1,5 +1,4 @@
 // subscribe.js  - Redirects CRUD events to subscribed clients
-//todo fix this
 
 const deepAssign = require('deep-assign');
 const config = require('./config');

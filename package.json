@@ -15,6 +15,7 @@
     "obj-perms-engine": "^2.3.0",
     "object-path": "latest",
     "password-hash": "latest",
-    "ws": "^3.1.0"
+    "ws": "^3.1.0",
+    "jsonfile": "latest"
   }
 }

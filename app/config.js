@@ -6,4 +6,5 @@ module.exports = {
     serverDefaultPass: "pass",
     permsModule: perms,
     version: pjson.version,
+    saveLocation: `${__dirname}\\data\\state.json`,
 };

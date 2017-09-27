@@ -8,8 +8,6 @@ const eng = new ObjPermsEngine({
     permsModule: config.permsModule,
 });
 
-const PERMS = config.permsModule.PERMS;
-
 module.exports = (on) => {
     on(['server_init', serverID, serverID], (state, next) => {
         //give server root perms

@@ -25,6 +25,7 @@ class Engine extends EventEmitter2 {
         this.emit = this.emit.bind(this);
         // this.use = this.use.bind(this); //this shouldn't be needed, since its never passed as a callback
         this._onPending = this._onPending.bind(this);
+        this._oncePending = this._oncePending.bind(this);
         this.emitAsync = this.emitAsync.bind(this);
     }
 
@@ -75,8 +76,7 @@ class Engine extends EventEmitter2 {
         const defaultParams = [undefined, '*', '*'];
         for (let i = 0; i < evt.length; i++)
             if (evt[i] !== undefined)
-                defaultParams[i] = evt[i];
-        evt = defaultParams;
+                evt[i] = defaultParams[i];
 
         this.pendingEmitter.emit(evt, payload, evt[1], evt[2]);
     }
