@@ -1,0 +1,1 @@
+module.exports.getDefault = (obj, defaultVal) => obj === undefined ? defaultVal : obj;

@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const config = require('./config');
 const serverID = config.serverID;
+const d = require("./util").getDefault;
 
 //handles a client websocket connection
 module.exports = (on) => {
@@ -37,17 +38,18 @@ module.exports = (on) => {
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {
                         const msg = JSON.parse(message);
-                        console.log(msg);
-                        engine.emit([msg.type, currClientID, msg.dst, ...(msg.params || [])], msg.payload);
+                        engine.emit([msg.evt.name, currClientID, msg.evt.dst, ...d(msg.evt.params, [])], msg.payload);
                     });
 
                     //pipe server messages to client
                     autoDisconnectAddListener(engine, ['*', '*', currClientID, '**'], function (payload) {
                         const msg = JSON.stringify({
-                            type: this.event[0],
-                            src: this.event[1],
+                            evt: {
+                                name: this.event[0],
+                                src: this.event[1],
+                                params: this.event.slice(2),
+                            },
                             payload: payload,
-                            params: this.event.slice(2),
                         });
                         ws.send(msg);
                     });

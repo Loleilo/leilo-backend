@@ -15,15 +15,15 @@ module.exports = (on, once) => {
     on(['save_server_state', serverID, serverID], (state, next, payload, engine) => {
         console.log("Saving to location", config.saveLocation, state);
         jsonfile.writeFile(config.saveLocation, state, (err) => {
+            if(err) engine.emit(['error_occurred', serverID, serverID], err);
             next(state);
-            engine.emit(['save_state_done', serverID, serverID]);
+            engine.emit(['save_state_finished', serverID, serverID]);
         });
-
     });
 
     once(['server_exit', serverID, serverID], (state, next, payload, engine) => {
         clearInterval(state.saveTimer);
         engine.emit(['save_server_state', serverID, serverID]);
-        engine.once(['save_state_done', serverID, serverID], () => next(state));
+        engine.once(['save_state_finished', serverID, serverID], () => next(state));
     });
 };

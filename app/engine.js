@@ -71,12 +71,12 @@ class Engine extends EventEmitter2 {
     }
 
     emit(evt, payload) {
-        if (Array.isArray(evt)) {
-            const defaultParams = [undefined, '*', '*'];
-            for (let i = 0; i < defaultParams.length; i++)
-                if (evt[i] === undefined)
-                    evt[i] = defaultParams[i];
-        }
+        if (!Array.isArray(evt)) throw new Error('Event must be array');
+
+        const defaultParams = [undefined, '*', '*'];
+        for (let i = 0; i < defaultParams.length; i++)
+            if (evt[i] === undefined)
+                evt[i] = defaultParams[i];
 
         this.pendingEmitter.emit(evt, payload, {
             name: evt[0],
