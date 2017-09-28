@@ -71,7 +71,7 @@ class Engine extends EventEmitter2 {
     }
 
     emit(evt, payload) {
-        if (!Array.isArray(evt)) throw new Error('Event must be array');
+        if (!Array.isArray(evt)) return; //todo //throw new Error('Event must be array');
 
         const defaultParams = [undefined, '*', '*'];
         for (let i = 0; i < defaultParams.length; i++)
@@ -82,7 +82,7 @@ class Engine extends EventEmitter2 {
             name: evt[0],
             src: evt[1],
             dst: evt[2],
-            params: evt.slice(3), //event params
+            path: evt.slice(3), //event location
         });
     }
 

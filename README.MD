@@ -17,6 +17,16 @@
      - request gets propagated to user
    - Program does first time setup through event script_init
    
+# scripts
+ - Scripts are stored using script code (persistent)
+      - Script code is owned by user, but can be shared
+ - Scripts are run as script instances (also persistent)
+      - Script instances are owned by the server, but user has some control over them
+      - Script instances simply store the id of the code the come from
+      - Script instances are created through script_init code
+         - script init will request all needed permissions, etc
+      - Scripts should listen to script_stop event
+   
 # notes
   - need clearer definition of what is persistent and what is not
      - Subscriptions are NOT persistent

@@ -1,4 +1,4 @@
-const perms = require('obj-perms-engine').NVEOPerms;
+const perms = require('obj-perms-engine').CRUDPerms;
 const version = require('../package.json').version;
 
 module.exports = {
@@ -8,4 +8,5 @@ module.exports = {
     version: version,
     saveLocation: `${__dirname}\\data\\state.json`,
     saveInterval: -1,
+    permsWildcard: '*',
 };

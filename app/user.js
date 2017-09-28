@@ -1,6 +1,7 @@
 const PasswordHash = require('password-hash');
 const config = require('./config');
 const serverID = config.serverID;
+const d = require('./util').getDefault;
 
 module.exports = (on) => {
     on(['server_init', serverID, serverID], (state, next) => {
@@ -8,9 +9,7 @@ module.exports = (on) => {
         defaultUsers[serverID] = {
             passwordHash: PasswordHash.generate(config.serverDefaultPass),
         };
-        state = Object.assign({
-            users: defaultUsers,
-        }, state);
+        state.users = d(state.users, defaultUsers);
 
         next(state);
     });

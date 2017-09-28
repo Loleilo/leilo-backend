@@ -4,8 +4,14 @@ const serverID = config.serverID;
 
 const ObjPermsEngine = obj_perms_engine.ObjPermsEngine;
 
-const eng = new ObjPermsEngine();
-eng.config.permsModule = obj_perms_engine.NVEOPerms;
+const eng = new ObjPermsEngine({
+    USER_LEVEL: {
+        ROOT: 0,
+        USER: 1,
+        PRGM: 3,
+    },
+    WILDCARD:config.permsWildcard,
+});
 
 module.exports = (on) => {
     on(['server_init', serverID, serverID], (state, next) => {
@@ -22,22 +28,22 @@ module.exports = (on) => {
     //map server CRUD events to actual object modifications
 
     on(['create', '*', serverID, '**'], (state, next, payload, engine, evt) => {
-        eng.create(evt.src, state, evt.params, payload.newObjName, payload.newObjVal);
+        eng.create(evt.src, state, evt.path, payload.newObjName, payload.newObjVal);
         next(state);
     });
 
     on(['update', '*', serverID, '**'], (state, next, payload, engine, evt) => {
-        eng.update(evt.src, state, evt.params, payload.value);
+        eng.update(evt.src, state, evt.path, payload.value);
         next(state);
     });
 
     on(['delete', '*', serverID, '**'], (state, next, payload, engine, evt) => {
-        eng.del(evt.src, state, evt.params);
+        eng.del(evt.src, state, evt.path);
         next(state);
     });
 
     on(['updatePerms', '*', serverID, '**'], (state, next, payload, engine, evt) => {
-        eng.updatePerms(evt.src, state, evt.params, payload.user, payload.perms);
+        eng.updatePerms(evt.src, state, evt.path, payload.user, payload.perms);
         next(state);
     });
 };

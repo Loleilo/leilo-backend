@@ -18,6 +18,8 @@
     "object-path": "latest",
     "password-hash": "latest",
     "ws": "^3.1.0",
-    "vm2": "latest"
+    "vm2": "latest",
+    "abind": "latest",
+    "auto-bind": "latest"
   }
 }

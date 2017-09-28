@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 const config = require('./config');
 const serverID = config.serverID;
 const d = require("./util").getDefault;
+const Sandbox = require('./sandbox').SandBox;
 
 //handles a client websocket connection
 module.exports = (on) => {
@@ -17,19 +18,23 @@ module.exports = (on) => {
                     const currClientID = msg.username;
                     console.log(`User @${currClientID} authenticated`);
 
+                    const clientSandbox = new Sandbox(engine, currClientID);
+
                     //auto disconnects on implicit disconnect (socket closed without warning)
                     function autoDisconnectAddListener(emitter, event, listener) {
                         //wrapper emits client_disconnected when listener is called and ws is not open
-                        const listenerWrapped = function (...args) {
+                        const listenerWrapped = (...args) => {
                             if (ws.readyState !== WebSocket.OPEN)
                                 engine.emit(['client_disconnected', currClientID, serverID]);
                             else listener.call(this, ...args);
                         };
 
-                        //handler removes the listener
-                        engine.once(['client_disconnected', currClientID, serverID], () => emitter.removeListener(event, listenerWrapped));
+                        let actualFunc = emitter.on(event, listenerWrapped);
+                        if (actualFunc === undefined) actualFunc = listenerWrapped;
 
-                        emitter.on(event, listenerWrapped);
+                        //handler removes the listener
+                        engine.once(['client_disconnected', currClientID, serverID],
+                            () => emitter.removeListener(event, actualFunc));
                     }
 
                     //emit disconnected also in explicit disconnect
@@ -38,17 +43,13 @@ module.exports = (on) => {
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {
                         const msg = JSON.parse(message);
-                        engine.emit([msg.evt.name, currClientID, msg.evt.dst, ...d(msg.evt.params, [])], msg.payload);
+                        clientSandbox.interface.emit(msg.evt, msg.payload);
                     });
 
                     //pipe server messages to client
-                    autoDisconnectAddListener(engine, ['*', '*', currClientID, '**'], function (payload) {
+                    autoDisconnectAddListener(clientSandbox.interface, ['*', '*', currClientID, '**'], (payload, evt) => {
                         const msg = JSON.stringify({
-                            evt: {
-                                name: this.event[0],
-                                src: this.event[1],
-                                params: this.event.slice(2),
-                            },
+                            evt: evt,
                             payload: payload,
                         });
                         ws.send(msg);

@@ -1,6 +1,4 @@
 // subscribe.js  - Redirects CRUD events to subscribed clients
-
-const objectAssignDeep = require(`object-assign-deep`);
 const config = require('./config');
 const PermissionError = require('obj-perms-engine').PermissionError;
 const serverID = require('./config').serverID;
@@ -16,7 +14,7 @@ const defaultPayload = {
 module.exports = (on) => {
     // allows a client to subscribe to state change events if they have read perms
     on(['subscribe', '*', serverID], (state, next, payload, engine, evt) => {
-        payload = objectAssignDeep({}, defaultPayload, payload); //default perms
+        payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //find prefix of path that does not contain wildcards
         let firstIdx;
@@ -25,7 +23,7 @@ module.exports = (on) => {
                 break;
 
         //check permissions on prefix path
-        if (state.readPerms(state, payload.path.slice(0, firstIdx), evt.src).lvl < PERMS.VIEWER)
+        if (!state.readPerms(state, payload.path.slice(0, firstIdx), evt.src)[PERMS.READ])
             throw new PermissionError('Not enough perms');
 
         //convert single event name to array for easier processing
@@ -40,7 +38,7 @@ module.exports = (on) => {
             //listener remaps event to send to subscriber
             const listener = (payloadInner, evtInner) => {
                 //if (evt.dst !== serverID)return;//todo fix this custy check to prevent duplicate sends
-                engine.emit([evtInner.name, evtInner.src, evt.src, ...evtInner.params], payloadInner);
+                engine.emit([evtInner.name, evtInner.src, evt.src, ...evtInner.path], payloadInner);
             };
             engine.on([evtNames[i], evtSrc, serverID, ...payload.path], listener);
         }
