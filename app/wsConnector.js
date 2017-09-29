@@ -15,7 +15,28 @@ module.exports = (on) => {
             const currConnectionID = "unauthenticated_connection_" + globalConnectionID;
             ws.send(`try_auth ${config.version}`);
 
-            ws.once('message', (data) => { //todo fix issue of this disconnecting, also fix error catching
+            //auto disconnects on implicit disconnect (socket closed without warning)
+            const autoDisconnectAddListener = (emitter, evt, listener, id, once = false) => {
+                //wrapper emits client_disconnected when listener is called and ws is not open
+                const listenerWrapped = (...args) => {
+                    if (ws.readyState !== WebSocket.OPEN)
+                        engine.emit(['client_disconnected', id, serverID]);
+                    else listener(...args);
+                };
+
+                //todo fix this cust
+                let func = emitter.on.bind(emitter);
+                if (once) func = emitter.once.bind(emitter);
+
+                let actualFunc = func(evt, listenerWrapped);
+                if (typeof(actualFunc) !== 'function') actualFunc = listenerWrapped;
+
+                //handler removes the listener
+                engine.once(['client_disconnected', id, serverID],
+                    () => emitter.removeListener(evt, actualFunc));
+            };
+
+            const messageHandler = (data) => { //todo fix error catching
                 const msg = JSON.parse(data);
 
                 if (isValidLogin(engine.state, msg)) {
@@ -28,22 +49,6 @@ module.exports = (on) => {
                     //create sandbox for client
                     const clientSandbox = new Sandbox(engine, currClientID);
 
-                    //auto disconnects on implicit disconnect (socket closed without warning)
-                    function autoDisconnectAddListener(emitter, evt, listener) {
-                        //wrapper emits client_disconnected when listener is called and ws is not open
-                        const listenerWrapped = (...args) => {
-                            if (ws.readyState !== WebSocket.OPEN)
-                                engine.emit(['client_disconnected', currClientID, serverID]);
-                            else listener(...args);
-                        };
-
-                        let actualFunc = emitter.on(evt, listenerWrapped);
-                        if (actualFunc === undefined) actualFunc = listenerWrapped;
-
-                        //handler removes the listener
-                        engine.once(['client_disconnected', currClientID, serverID],
-                            () => emitter.removeListener(evt, actualFunc));
-                    }
 
                     //emit disconnected also in explicit disconnect
                     ws.once('disconnect', () => engine.emit(['client_disconnected', currClientID, serverID]));
@@ -52,7 +57,7 @@ module.exports = (on) => {
                     autoDisconnectAddListener(ws, 'message', (message) => {
                         const msg = JSON.parse(message);
                         clientSandbox.interface.emit(msg.evt, msg.payload);
-                    });
+                    }, currClientID);
 
                     //handles when server sends messages to client
                     const serverEvtHandler = (payload, evt) => {
@@ -67,12 +72,12 @@ module.exports = (on) => {
                     autoDisconnectAddListener(clientSandbox.interface, {
                         name: '*',
                         src: '*',
-                    }, serverEvtHandler);
+                    }, serverEvtHandler, currClientID);
                     autoDisconnectAddListener(clientSandbox.interface, {
                         name: '*',
                         src: '*',
                         path: ['**'],
-                    }, serverEvtHandler);
+                    }, serverEvtHandler, currClientID);
 
                     //display disconnected message
                     engine.once(['client_disconnected', currClientID, currClientID], () => {
@@ -85,7 +90,8 @@ module.exports = (on) => {
                     ws.send(`auth_rejected`);
                     ws.close();
                 }
-            });
+            };
+            autoDisconnectAddListener(ws, 'message', messageHandler, currConnectionID, true);
         });
 
         next(state);
