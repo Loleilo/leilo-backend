@@ -20,7 +20,7 @@ module.exports = () => {
     engine.use(obj);
     engine.use(subscribe);
     engine.use(scripts);
-    engine.use(user);
+    engine.use(user.middleware);
     engine.use(wsConnector);
     engine.use(debug);
 

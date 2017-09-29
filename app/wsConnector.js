@@ -11,7 +11,7 @@ module.exports = (on) => {
         const wss = new WebSocket.Server({port: 80});
         wss.on('connection', (ws) => {
             globalConnectionID++;
-            const currConnectionID = globalConnectionID;
+            const currConnectionID = "unauthenticated_connection_" + globalConnectionID;
             ws.send(`try_auth ${config.version}`);
 
             ws.once('message', (data) => { //todo fix issue of this disconnecting, also fix error catching

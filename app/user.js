@@ -3,7 +3,7 @@ const config = require('./config');
 const serverID = config.serverID;
 const d = require('./util').getDefault;
 
-module.exports = (on) => {
+module.exports.middleware = (on) => {
     on(['server_init', serverID, serverID], (state, next) => {
         const defaultUsers = {};
         defaultUsers[serverID] = {
@@ -56,4 +56,12 @@ module.exports = (on) => {
         }
         next(state);
     });
+};
+
+module.exports.isValid = (state, credentials) => {
+    const username = credentials.username;
+    if (state.users[username])
+        if (PasswordHash.verify(credentials.password, state.users[username].passwordHash))
+            return true;
+    return false;
 };

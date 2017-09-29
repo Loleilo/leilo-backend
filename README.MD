@@ -1,14 +1,11 @@
 # todo
- 1. Main object system
  1. remove all direct sets
- 1. error checking
- 1. Create api map (documentation)
- 2. Server side instantiatedScripts
- 3. Parameter checking system
- 3. Clients cannot subscribe more than once to same part
-    - So that they don't recieve repeated notifications
- 4. Wildcard vulnerabilities
+ 1. deleted objects aren't cleaned up
+ 2. add semantic version to file
  5. Remove unneccesary events, for example, calling try_auth
+ 3. Parameter checking system
+ 4. security
+ 1. Create api map (documentation)
  
 # sandbox
    - server script can register callbacks to part of object tree
