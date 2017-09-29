@@ -24,7 +24,7 @@ module.exports = (on) => {
                     else listener(...args);
                 };
 
-                //todo fix this cust
+                //todo make this less custy
                 let func = emitter.on.bind(emitter);
                 if (once) func = emitter.once.bind(emitter);
 

@@ -3,7 +3,7 @@ const pathed = require("./pathed.js");
 const a = Object.assign;
 
 const defaultOptions = {
-    scope: [], //todo think about wildcard in scope
+    scope: [],
     allowRemoveAllListeners: false,
     forceSrc: true,
     forceDst: true,

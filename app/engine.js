@@ -4,10 +4,12 @@ const EventEmitterChain2 = require('eventemitterchain2').EventEmitterChain2;
 const config = require('./config');
 let toObj = require("./pathed").toObj;
 const serverID = config.serverID;
+const abind = require('auto-bind');
+var evtType = require("./pathed.js").evtType;
 
 const defaultConf = {
     wildcard: true, //enable wildcards in event name
-    maxListeners: config.engineMaxListeners, //todo tune this later
+    maxListeners: config.engineMaxListeners,
 };
 
 //Handles state change events and allows for middleware (aka functions that may modify events as they are passed down)
@@ -16,20 +18,13 @@ const defaultConf = {
 class Engine extends EventEmitter2 {
     constructor(initState = {}) {
         super(defaultConf);
+        abind(this);
 
         this.state = initState;
 
         // const actualSuper = super;
         //handles events for middleware (aka before actual event is run)
         this.pendingEmitter = new EventEmitterChain2(defaultConf, (...args) => super.emit(...args));
-
-
-        //todo not sure if this is needed
-        this.emit = this.emit.bind(this);
-        // this.use = this.use.bind(this); //this shouldn't be needed, since its never passed as a callback
-        this._onPending = this._onPending.bind(this);
-        this._oncePending = this._oncePending.bind(this);
-        this.emitAsync = this.emitAsync.bind(this);
     }
 
     _createHandler(callback) {
@@ -73,7 +68,10 @@ class Engine extends EventEmitter2 {
     }
 
     emit(evt, payload) {
-        if (!Array.isArray(evt)) return; //todo //throw new Error('Event must be array');
+        if (!Array.isArray(evt) || evtType(evt) === 'invalid') {
+            this.emit(['error_occurred', serverID, serverID], new Error('Invalid event'));
+            return;
+        }
 
         const defaultParams = [undefined, '*', '*'];
         for (let i = 0; i < defaultParams.length; i++)
@@ -84,7 +82,6 @@ class Engine extends EventEmitter2 {
     }
 
     emitAsync(...args) {
-        //todo fix which ones actually require emit async
         process.nextTick(() => this.emit(...args))
     }
 }

@@ -42,20 +42,6 @@ module.exports.middleware = (on) => {
 
         next(state);
     });
-
-    //todo convert this to simple function
-    on(['try_auth', '*', serverID], (state, next, payload, engine, evt) => {
-        const username = payload.username;
-        if (state.users[username] === undefined) {
-            engine.emit(['auth_rejected', serverID, evt.src]);
-        } else {
-            if (PasswordHash.verify(payload.password, state.users[username].passwordHash))
-                engine.emit(['auth_successful', serverID, evt.src]);
-            else
-                engine.emit(['auth_rejected', serverID, evt.src]);
-        }
-        next(state);
-    });
 };
 
 module.exports.isValidLogin = (state, credentials) => {

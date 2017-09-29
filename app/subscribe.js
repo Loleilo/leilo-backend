@@ -31,13 +31,13 @@ module.exports = (on) => {
             payload.name = [payload.name];
 
         const evtNames = payload.name;
-        const evtSrc = payload.src; //todo later restrict who can see src and dst
+        const evtSrc = payload.src;
 
         //go through every event name listed
         for (let i = 0; i < evtNames.length; i++) {
             //listener remaps event to send to subscriber
             const listener = (payloadInner, evtInner) => {
-                //if (evt.dst !== serverID)return;//todo fix this custy check to prevent duplicate sends
+                //todo prevent duplicates (e.g. sending it to yourself)
                 engine.emit([evtInner.name, evtInner.src, evt.src, ...evtInner.path], payloadInner);
             };
             engine.on([evtNames[i], evtSrc, serverID, ...payload.path], listener);

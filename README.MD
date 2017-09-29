@@ -2,9 +2,8 @@
  1. remove all direct sets
  1. deleted objects aren't cleaned up
  2. add semantic version to file
- 5. Remove unneccesary events
- 3. Parameter checking system
  4. security
+ 3. Parameter checking system
  1. Create api map (documentation)
  
 # sandbox
