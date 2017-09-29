@@ -5,7 +5,7 @@ const config = require('./config');
 let toObj = require("./pathed").toObj;
 const serverID = config.serverID;
 const abind = require('auto-bind');
-var evtType = require("./pathed.js").evtType;
+const evtType = require("./pathed.js").evtType;
 
 const defaultConf = {
     wildcard: true, //enable wildcards in event name
@@ -68,8 +68,14 @@ class Engine extends EventEmitter2 {
     }
 
     emit(evt, payload) {
+        //ignore internal events
+        if (evt === 'newListener' || evt==='removeListener')return;
+
         if (!Array.isArray(evt) || evtType(evt) === 'invalid') {
-            this.emit(['error_occurred', serverID, serverID], new Error('Invalid event'));
+            this.emit(['error_occurred', serverID, serverID], {
+                err: new Error('Invalid event'),
+                srcEvt: evt,
+            });
             return;
         }
 

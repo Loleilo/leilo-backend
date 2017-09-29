@@ -1,5 +1,6 @@
 # todo
- 1. remove all direct sets
+ 1. wrap all event in proper format {err:Error, srcUser ... etc}
+ 2. remove all direct sets
  1. deleted objects aren't cleaned up
  2. add semantic version to file
  4. security

@@ -12,16 +12,18 @@ module.exports = (on) => {
         const wss = new WebSocket.Server({port: 80});
         wss.on('connection', (ws) => {
             globalConnectionID++;
-            const currConnectionID = "unauthenticated_connection_" + globalConnectionID;
+            const currConnectionID = "connection_" + globalConnectionID;
             ws.send(`try_auth ${config.version}`);
 
             //auto disconnects on implicit disconnect (socket closed without warning)
             const autoDisconnectAddListener = (emitter, evt, listener, id, once = false) => {
                 //wrapper emits client_disconnected when listener is called and ws is not open
                 const listenerWrapped = (...args) => {
-                    if (ws.readyState !== WebSocket.OPEN)
+                    if (ws.readyState !== WebSocket.OPEN) {
+                        if (ws.disconnectEmitted)return;
+                        ws.disconnectEmitted = true;
                         engine.emit(['client_disconnected', id, serverID]);
-                    else listener(...args);
+                    } else listener(...args);
                 };
 
                 //todo make this less custy
@@ -35,6 +37,11 @@ module.exports = (on) => {
                 engine.once(['client_disconnected', id, serverID],
                     () => emitter.removeListener(evt, actualFunc));
             };
+
+            //display disconnected message
+            engine.once(['client_disconnected', currConnectionID, currConnectionID], () => {
+                console.log(`Client @${currConnectionID} disconnected`);
+            });
 
             const messageHandler = (data) => {
                 let msg;
@@ -54,10 +61,6 @@ module.exports = (on) => {
                     //create sandbox for client
                     const clientSandbox = new Sandbox(engine, currClientID);
 
-
-                    //emit disconnected also in explicit disconnect
-                    ws.once('disconnect', () => engine.emit(['client_disconnected', currClientID, serverID]));
-
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {
                         try {
@@ -66,7 +69,7 @@ module.exports = (on) => {
                         } catch (err) {
                             engine.emit(['error_occurred', currClientID, currClientID], new Error("Couldn't parse JSON"));
                         }
-                    }, currClientID);
+                    }, currConnectionID);
 
                     //handles when server sends messages to client
                     const serverEvtHandler = (payload, evt) => {
@@ -76,22 +79,15 @@ module.exports = (on) => {
                         });
                         ws.send(msg);
                     };
-
-                    //pipe server messages to client
                     autoDisconnectAddListener(clientSandbox.interface, {
                         name: '*',
                         src: '*',
-                    }, serverEvtHandler, currClientID);
+                    }, serverEvtHandler, currConnectionID);
                     autoDisconnectAddListener(clientSandbox.interface, {
                         name: '*',
                         src: '*',
                         path: ['**'],
-                    }, serverEvtHandler, currClientID);
-
-                    //display disconnected message
-                    engine.once(['client_disconnected', currClientID, currClientID], () => {
-                        console.log(`Client @${currClientID} disconnected`);
-                    });
+                    }, serverEvtHandler, currConnectionID);
 
                     //send client connected event
                     engine.emit(['client_connected', serverID, serverID], undefined, currClientID);
@@ -100,6 +96,7 @@ module.exports = (on) => {
                     ws.close();
                 }
             };
+
             autoDisconnectAddListener(ws, 'message', messageHandler, currConnectionID, true);
         });
 

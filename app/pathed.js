@@ -3,11 +3,12 @@ let d = require('./util').getDefault;
 
 module.exports.evtType = (evt) => {
     if (Array.isArray(evt)) {
-        if (evt[0] === '**' || evt[1] === '**' || evt[2] === '*')return "invalid";
+        if (evt[0] === '**' || evt[1] === '**' || evt[2] === '**')return "invalid";
         if (evt.length > 3) {
             if (evt[3] === pathMarker)return "pathed";
             return "invalid";
         }
+        return "unpathed";
     }
     if (evt.name === '**' || evt.src === '**' || evt.dst === '**')return "invalid";
     if (evt.name === undefined)return "invalid";
