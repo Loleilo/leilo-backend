@@ -14,7 +14,8 @@
    - Interacts with main program through 2 ways:
         - input - subscribe to events, though function on(evt, callback), once(evt, callback)
         - output - send events through function emit(evt, payload)
-   - program obtains required permissions through event request_run_elevated - program requests action to be run with users permissions
+   - program obtains required permissions through event request_run_elevated - program
+    requests action to be run with users permissions
      - request gets propagated to user
    - Program does firstRun time setup through event script_init
    
@@ -29,6 +30,8 @@
       - Scripts should listen to script_stop event
    
 # notes
+  - do we really need a custom middleware system?
+     - the only thing its used for is to make sure scripts are in order, which is not even that important
   - need clearer definition of what is persistent and what is not
      - Subscriptions are NOT persistent
      - script instances are persistant, their states are not

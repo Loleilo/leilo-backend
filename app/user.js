@@ -7,7 +7,7 @@ module.exports.middleware = (on) => {
     on(['server_init', serverID, serverID], (state, next) => {
         const defaultUsers = {};
         defaultUsers[serverID] = {
-            passwordHash: PasswordHash.generate(config.serverDefaultPass),
+            passwordHash: PasswordHash.generate(config.serverDefaultPassword),
         };
         state.users = d(state.users, defaultUsers);
 

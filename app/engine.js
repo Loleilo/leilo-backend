@@ -7,7 +7,7 @@ const serverID = config.serverID;
 
 const defaultConf = {
     wildcard: true, //enable wildcards in event name
-    maxListeners: 10, //todo tune this later
+    maxListeners: config.engineMaxListeners, //todo tune this later
 };
 
 //Handles state change events and allows for middleware (aka functions that may modify events as they are passed down)

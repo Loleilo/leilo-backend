@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 const config = require('./config');
-var isValidLogin = require("./user.js").isValidLogin;
+const isValidLogin = require("./user.js").isValidLogin;
 const serverID = config.serverID;
 const Sandbox = require('./sandbox').Sandbox;
 
@@ -36,10 +36,15 @@ module.exports = (on) => {
                     () => emitter.removeListener(evt, actualFunc));
             };
 
-            const messageHandler = (data) => { //todo fix error catching
-                const msg = JSON.parse(data);
+            const messageHandler = (data) => {
+                let msg;
+                try {
+                    msg = JSON.parse(data);
+                } catch (err) {
+                    engine.emit(['error_occurred', currConnectionID, serverID], new Error("Couldn't parse JSON"));
+                }
 
-                if (isValidLogin(engine.state, msg)) {
+                if (msg !== undefined && isValidLogin(engine.state, msg)) {
                     ws.send(`auth_successful`); //send indicator
 
                     //store current client username
@@ -55,8 +60,12 @@ module.exports = (on) => {
 
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {
-                        const msg = JSON.parse(message);
-                        clientSandbox.interface.emit(msg.evt, msg.payload);
+                        try {
+                            const msg = JSON.parse(message);
+                            clientSandbox.interface.emit(msg.evt, msg.payload);
+                        } catch (err) {
+                            engine.emit(['error_occurred', currClientID, currClientID], new Error("Couldn't parse JSON"));
+                        }
                     }, currClientID);
 
                     //handles when server sends messages to client
