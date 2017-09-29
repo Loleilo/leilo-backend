@@ -1,5 +1,6 @@
 const WebSocket = require('ws');
 const config = require('./config');
+var isValidLogin = require("./user.js").isValidLogin;
 const serverID = config.serverID;
 const Sandbox = require('./sandbox').Sandbox;
 
@@ -17,10 +18,7 @@ module.exports = (on) => {
             ws.once('message', (data) => { //todo fix issue of this disconnecting, also fix error catching
                 const msg = JSON.parse(data);
 
-                const successHandler = () => {
-                    //remove other handler
-                    engine.removeListener(['auth_rejected', serverID, currConnectionID], rejectHandler);
-
+                if (isValidLogin(engine.state, msg)) {
                     ws.send(`auth_successful`); //send indicator
 
                     //store current client username
@@ -83,19 +81,10 @@ module.exports = (on) => {
 
                     //send client connected event
                     engine.emit(['client_connected', serverID, serverID], undefined, currClientID);
-                };
-
-                //handles if client login is rejected
-                const rejectHandler = () => {
-                    engine.removeListener(['auth_successful', serverID, currConnectionID], successHandler);
+                } else {
                     ws.send(`auth_rejected`);
                     ws.close();
-                };
-
-                //attach auth handlers
-                engine.once(['auth_successful', serverID, currConnectionID], successHandler);
-                engine.once(['auth_rejected', serverID, currConnectionID], rejectHandler);
-                engine.emit(['try_auth', currConnectionID, serverID], msg);
+                }
             });
         });
 

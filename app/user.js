@@ -58,7 +58,7 @@ module.exports.middleware = (on) => {
     });
 };
 
-module.exports.isValid = (state, credentials) => {
+module.exports.isValidLogin = (state, credentials) => {
     const username = credentials.username;
     if (state.users[username])
         if (PasswordHash.verify(credentials.password, state.users[username].passwordHash))
