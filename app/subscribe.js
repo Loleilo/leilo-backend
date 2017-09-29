@@ -23,7 +23,7 @@ module.exports = (on) => {
                 break;
 
         //check permissions on prefix path
-        if (!state.readPerms(state, payload.path.slice(0, firstIdx), evt.src)[PERMS.READ])
+        if (state.readPerms(state, payload.path.slice(0, firstIdx), evt.src).lvl<PERMS.VIEWER)
             throw new PermissionError('Not enough perms');
 
         //convert single event name to array for easier processing
@@ -47,7 +47,7 @@ module.exports = (on) => {
     });
 
     on(['unsubscribe', '*', serverID], (state, next, payload, engine) => {
-        payload = objectAssignDeep({}, defaultPayload, payload); //default perms
+        payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //convert single event name to array for easier processing
         if (!Array.isArray(payload.name))

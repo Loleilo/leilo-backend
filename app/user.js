@@ -22,6 +22,9 @@ module.exports = (on) => {
             passwordHash: PasswordHash.generate(payload.password)
         };
 
+        //give user level
+        state.updateUserLevel(serverID, state, payload.username, 1);//todo replace 1 with constant
+
         next(state);
     });
 
@@ -34,21 +37,23 @@ module.exports = (on) => {
     });
 
     on(['delete_user', '*', serverID], (state, next, payload, engine, evt) => {
-        //todo make sure to disconnect user on delete
+        //todo make sure to disconnect user on delete, also to clean up user perms
         state.users[evt.src] = null;
 
         next(state);
     });
 
+    //todo convert this to simple function
     on(['try_auth', '*', serverID], (state, next, payload, engine, evt) => {
-        const src = evt.src;
-        if (state.users[src] === undefined) {
-            engine.emit(['auth_rejected', serverID, src]);
-            return;
+        const username = payload.username;
+        if (state.users[username] === undefined) {
+            engine.emit(['auth_rejected', serverID, evt.src]);
+        } else {
+            if (PasswordHash.verify(payload.password, state.users[username].passwordHash))
+                engine.emit(['auth_successful', serverID, evt.src]);
+            else
+                engine.emit(['auth_rejected', serverID, evt.src]);
         }
-        if (PasswordHash.verify(payload.password, state.users[src].passwordHash))
-            engine.emit(['auth_successful', serverID, src]);
-        else
-            engine.emit(['auth_rejected', serverID, src]);
+        next(state);
     });
 };

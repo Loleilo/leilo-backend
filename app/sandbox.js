@@ -1,82 +1,106 @@
-let abind = require("auto-bind");
-let d = require('./util').getDefault;
+const abind = require("auto-bind");
+const pathed = require("./pathed.js");
+const a = Object.assign;
 
 const defaultOptions = {
-    scopedEvents: ['update', 'updatePerms', 'create', 'delete'],
     scope: [], //todo think about wildcard in scope
+    allowRemoveAllListeners: false,
+    forceSrc: true,
+    forceDst: true,
 };
 
 class SandboxError extends Error {
-
 }
-
 module.exports.SandboxError = SandboxError;
 
 class Sandbox {
-    constructor(engine, userID, options) {
-        this.options = Object.assign(defaultOptions, options);
-        this.disabled = false;
-        this.interface = {
-            emit: this.applySandbox(
-                (evt, scope, payload) => engine.emit([evt.name, userID, evt.dst, ...scope, ...d(evt.path, [])], payload)),
-
-            on: this.applySandbox((evt, scope, callback) => {
-                const wrapper = (payload, evtInner) => {
-                    if (this.disabled)return; //dont pass call if disabled
-                    callback(payload, {
-                        //rewrite path info to scope
-                        name: evtInner.name,
-                        src: evtInner.src,
-                        dst: userID,
-                        path: evtInner.path.slice(scope.length)
-                    });
-                };
-                const evtArr = [evt.name, evt.src, userID, ...scope, ...d(evt.path, [])];
-                engine.on(evtArr, wrapper);
-                return wrapper; //returns so that script can removeListener
-            }),
-
-            once: this.applySandbox((evt, scope, callback) => {
-                const wrapper = (payload, evtInner) => {
-                    if (this.disabled)return; //dont pass call if disabled
-                    callback(payload, {
-                        //rewrite path info to scope
-                        name: evtInner.name,
-                        src: evtInner.src,
-                        dst: userID,
-                        path: evtInner.path.slice(scope.length)
-                    });
-                };
-                const evtArr = [evt.name, evt.src, userID, ...scope, ...d(evt.path, [])];
-                engine.once(evtArr, wrapper);
-                return wrapper;
-            }),
-
-            removeListener: this.applySandbox((evt, scope, callback) => {
-                engine.removeListener([evt.name, evt.src, userID, ...scope, ...d(evt.path, [])], callback);
-            })
-
-            //NOTE: removeAllListeners is not allowed, because it may remove other users' listeners as well
-        };
-
+    constructor(engine, userID, options = {}) {
         abind(this);
+
+        this.options = Object.assign(defaultOptions, options);
+        this._userID = userID;
+        this._engine = engine;
+
+        this.disabled = false;
+
+        //expose wrapped functions in single interface
+        this.interface = {
+            emit: this._sandboxify(this._emit),
+            on: this._sandboxify(this._on),
+            once: this._sandboxify(this._once),
+            removeListener: this._sandboxify(this._removeListener),
+        };
+
+        if (options.allowRemoveAllListeners)
+            this.removeAllListeners = this._sandboxify(this._removeAllListeners);
     }
 
-    applySandbox(func) {
-        return (evt, ...args) => {
-            if (this.disabled)throw new SandboxError('Interface has been disabled');
-
-            let scope = [];
-            if (this.options.scopedEvents.includes(evt.name))
-                scope = this.options.scope;
-
-            func(evt, scope, ...args);
+    //wraps a function with some checks
+    _sandboxify(func) {
+        return ( ...args) => {
+            if (this.disabled)
+                throw new SandboxError('Interface disabled');
+            return func(...args);
         };
     }
 
-    disable() {
-        this.disabled = true;
+
+    //these two functions convert between events inside scope, and events outside scope
+
+    _scopeSrc(evt) {
+        if (pathed.evtType(evt) === 'pathed')
+            evt.path = evt.path.slice(this.options.length);
+        return evt;
+    }
+
+    _scopeDst(evt) {
+        const type = pathed.evtType(evt);
+        if (type === 'invalid')throw new SandboxError("Invalid event");
+        if (type === 'pathed')
+            evt.path = this.options.scope.concat(evt.path);
+        return pathed.toArr(evt);
+    }
+
+    //scoped emit and on functions
+
+    _emit(evt, payload) {
+        if (this.options.forceSrc) evt = a(evt, {
+            src: this._userID // force src to be this user
+        });
+        this._engine.emit(this._scopeDst(evt), payload);
+    }
+
+    _on(evt, callback) {
+        if (this.options.forceDst) evt = a(evt, {
+            dst: this._userID // force dst to be this user
+        });
+        const wrapped = (payload, evtInner) => callback(payload, this._scopeSrc((evtInner)));
+        this._engine.on(this._scopeDst(evt), wrapped);
+        return wrapped; //for client to use if they want to remove
+    }
+
+    _once(evt, callback) {
+        if (this.options.forceDst) evt = a(evt, {
+            dst: this._userID // force dst to be this user
+        });
+        const wrapped = (payload, evtInner) => callback(payload, this._scopeSrc((evtInner)));
+        this._engine.once(this._scopeDst(evt), wrapped);
+        return wrapped; //for client to use if they want to remove
+    }
+
+    _removeListener(evt, callback) {
+        if (this.options.forceDst) evt = a(evt, {
+            dst: this._userID // force dst to be this user
+        });
+        this._engine.removeListener(this._scopeDst(evt), callback);
+    }
+
+    _removeAllListeners(evt) {
+        if (this.options.forceDst) evt = a(evt, {
+            dst: this._userID // force dst to be this user
+        });
+        this._engine.removeAllListeners(this._scopeDst(evt));
     }
 }
 
-module.exports.SandBox = Sandbox;
+module.exports.Sandbox = Sandbox;

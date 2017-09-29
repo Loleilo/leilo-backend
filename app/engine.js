@@ -1,7 +1,9 @@
 //EventEmitter2 - allows wildcard events and namespacing
 const EventEmitter2 = require('eventemitter2').EventEmitter2;
 const EventEmitterChain2 = require('eventemitterchain2').EventEmitterChain2;
-const serverID = require('./config').serverID;
+const config = require('./config');
+let toObj = require("./pathed").toObj;
+const serverID = config.serverID;
 
 const defaultConf = {
     wildcard: true, //enable wildcards in event name
@@ -78,12 +80,7 @@ class Engine extends EventEmitter2 {
             if (evt[i] === undefined)
                 evt[i] = defaultParams[i];
 
-        this.pendingEmitter.emit(evt, payload, {
-            name: evt[0],
-            src: evt[1],
-            dst: evt[2],
-            path: evt.slice(3), //event location
-        });
+        this.pendingEmitter.emit(evt, payload, toObj(evt));
     }
 
     emitAsync(...args) {

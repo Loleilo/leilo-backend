@@ -4,12 +4,13 @@ const jsonfile = require('jsonfile');
 
 module.exports = (on, once) => {
     on(['server_init', serverID, serverID], (state, next, payload, engine) => {
-        jsonfile.readFile(config.saveLocation, (err, obj) => {
-            if (!obj) obj = {};
-            if (config.saveInterval > 0)
-                obj.saveTimer = setInterval(() => engine.emit(['save_server_state', serverID, serverID]), config.saveInterval);
-            next(obj);
-        });
+        // jsonfile.readFile(config.saveLocation, (err, obj) => {
+        //     if (!obj) obj = {};
+        //     if (config.saveInterval > 0)
+        //         obj.saveTimer = setInterval(() => engine.emit(['save_server_state', serverID, serverID]), config.saveInterval);
+        //     next(obj);
+        // });
+        next(state);
     });
 
     on(['save_server_state', serverID, serverID], (state, next, payload, engine) => {

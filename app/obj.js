@@ -8,9 +8,10 @@ const eng = new ObjPermsEngine({
     USER_LEVEL: {
         ROOT: 0,
         USER: 1,
-        PRGM: 3,
+        PRGM: 2,
     },
-    WILDCARD:config.permsWildcard,
+    WILDCARD: config.permsWildcard,
+    permsModule: config.permsModule,
 });
 
 module.exports = (on) => {
@@ -20,6 +21,8 @@ module.exports = (on) => {
 
         //expose functions that will be required by other modules in state
         state.readPerms = eng.readPerms;
+        state.read = eng.read;
+        state.updateUserLevel = eng.updateUserLevel;
 
         next(state);
     });
@@ -27,22 +30,22 @@ module.exports = (on) => {
 
     //map server CRUD events to actual object modifications
 
-    on(['create', '*', serverID, '**'], (state, next, payload, engine, evt) => {
+    on(['create', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
         eng.create(evt.src, state, evt.path, payload.newObjName, payload.newObjVal);
         next(state);
     });
 
-    on(['update', '*', serverID, '**'], (state, next, payload, engine, evt) => {
+    on(['update', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
         eng.update(evt.src, state, evt.path, payload.value);
         next(state);
     });
 
-    on(['delete', '*', serverID, '**'], (state, next, payload, engine, evt) => {
+    on(['delete', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
         eng.del(evt.src, state, evt.path);
         next(state);
     });
 
-    on(['updatePerms', '*', serverID, '**'], (state, next, payload, engine, evt) => {
+    on(['updatePerms', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
         eng.updatePerms(evt.src, state, evt.path, payload.user, payload.perms);
         next(state);
     });
