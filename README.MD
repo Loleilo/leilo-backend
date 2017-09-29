@@ -1,4 +1,6 @@
 # todo
+ 1. if state reference is changed, events registered inside middleware will point to wrong instance
+ 1. better permission request system
  1. deleted objects aren't cleaned up
  2. add semantic version to file
  4. security
@@ -15,7 +17,7 @@
    - program obtains required permissions through event request_run_elevated - program
     requests action to be run with users permissions
      - request gets propagated to user
-   - Program does firstRun time setup through event script_init
+   - Program does needInit time setup through event script_init
    
 # instantiatedScripts
  - Scripts are stored using script code (persistent)
@@ -28,6 +30,10 @@
       - Scripts should listen to script_stop event
    
 # notes
+  - consider sending callbacks in events
+  - use engine.on as often as possible, since its way more efficeint
+  - make sure state object is never leaked through sandbox
+  - script probably should not know parent user id
   - do we really need a custom middleware system?
      - the only thing its used for is to make sure scripts are in order, which is not even that important
   - need clearer definition of what is persistent and what is not

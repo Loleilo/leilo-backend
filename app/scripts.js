@@ -13,6 +13,7 @@ module.exports = (on) => {
         //auto run scripts
         for (const script in state.instantiatedScripts) {
             if (!state.instantiatedScripts.hasOwnProperty(script)) continue;
+            state.instantiatedScripts[script].running = false;
             engine.emit(['script_start', serverID, serverID], {
                 scriptInstanceID: script
             });
@@ -26,6 +27,7 @@ module.exports = (on) => {
         const scriptInstanceID = payload.scriptInstanceID;
         const info = state.instantiatedScripts[scriptInstanceID];
 
+        //prevent script from running twice
         if (info.running) {
             engine.emit(['error_occurred', serverID, evt.src], {
                 err: new Error('Script instance is already running')
@@ -50,6 +52,12 @@ module.exports = (on) => {
             },
             config.globalVMOptions));
 
+        //setup event for script to request an evt to be send as parent user
+        engine.on(['request_elevated', scriptInstanceID, serverID], (payload) => {
+            //pipe event to user (event is not directly sent for security reasons)
+            engine.emit(['request_elevated', scriptInstanceID, info.parentID], payload);
+        });
+
         //choose which code to run
         let code;
         if (info.runFromPath)
@@ -60,9 +68,12 @@ module.exports = (on) => {
         vm.run(code); //actually run code
 
         //if first run of script, call script init func
-        if (info.firstRun) {
-            state.instantiatedScripts[scriptInstanceID].firstRun = false;
-            engine.emit(['init_run', info.parentID, scriptInstanceID]);
+        if (info.needInit) {
+            // script should emit init_done when setup is done
+            engine.once(['init_done', scriptInstanceID, serverID], () => {
+                state.instantiatedScripts[scriptInstanceID].needInit = false;
+            });
+            engine.emit(['init_run', serverID, scriptInstanceID]);
         }
 
         next(state);
@@ -78,7 +89,7 @@ module.exports = (on) => {
         //store script info
         state.instantiatedScripts[scriptInstanceID] = Object.assign(payload, {
             parentID: evt.src,
-            firstRun: true,
+            needInit: true,
         });
 
         //run script

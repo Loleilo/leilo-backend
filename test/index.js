@@ -23,7 +23,7 @@ ws.on('open', function open() {
                 src: '*'
             }, ()=>{
                 emit({
-                    name: 'yay2'
+                    name: 'init_done'
                 });
             });
              emit({
