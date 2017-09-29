@@ -27,7 +27,9 @@ module.exports = (on) => {
         const info = state.instantiatedScripts[scriptInstanceID];
 
         if (info.running) {
-            engine.emit(['error_occurred', serverID, evt.src], new Error('Script instance is already running'));
+            engine.emit(['error_occurred', serverID, evt.src], {
+                err: new Error('Script instance is already running')
+            });
             next(state);
         }
         info.running = true;

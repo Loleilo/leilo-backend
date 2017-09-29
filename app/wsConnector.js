@@ -48,7 +48,9 @@ module.exports = (on) => {
                 try {
                     msg = JSON.parse(data);
                 } catch (err) {
-                    engine.emit(['error_occurred', currConnectionID, serverID], new Error("Couldn't parse JSON"));
+                    engine.emit(['error_occurred', currConnectionID, serverID], {
+                        err: new Error("Couldn't parse JSON")
+                    });
                 }
 
                 if (msg !== undefined && isValidLogin(engine.state, msg)) {
@@ -67,7 +69,9 @@ module.exports = (on) => {
                             const msg = JSON.parse(message);
                             clientSandbox.interface.emit(msg.evt, msg.payload);
                         } catch (err) {
-                            engine.emit(['error_occurred', currClientID, currClientID], new Error("Couldn't parse JSON"));
+                            engine.emit(['error_occurred', currClientID, currClientID], {
+                                err: new Error("Couldn't parse JSON")
+                            });
                         }
                     }, currConnectionID);
 
