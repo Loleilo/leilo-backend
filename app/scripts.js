@@ -32,7 +32,7 @@ module.exports = (on) => {
             });
             next(state);
         }
-        info.running = true;
+        state.instantiatedScripts[scriptInstanceID].running = true;
 
         //create script sandbox
         const sandbox = new Sandbox(engine, scriptInstanceID,

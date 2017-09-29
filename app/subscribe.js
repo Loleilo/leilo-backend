@@ -1,4 +1,6 @@
-// subscribe.js  - Redirects CRUD events to subscribed clients
+// subscribe.js  - Allows clients to see CRUD events on parts of object they are allowed to view
+// This is needed because CRUD events are only sent to the server unless sender specifies otherwise
+
 const config = require('./config');
 const PermissionError = require('obj-perms-engine').PermissionError;
 const serverID = require('./config').serverID;
@@ -13,17 +15,17 @@ const defaultPayload = {
 
 module.exports = (on) => {
     // allows a client to subscribe to state change events if they have read perms
-    on(['subscribe', '*', serverID], (state, next, payload, engine, evt) => {
+    on(['subscribe', '*', serverID, 'path', '**'], (state, next, payload, engine, evt) => {
         payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //find prefix of path that does not contain wildcards
         let firstIdx;
-        for (firstIdx = 0; firstIdx < payload.path.length; firstIdx++)
-            if (payload.path[firstIdx] === '*' || payload.path[firstIdx] === '**')
+        for (firstIdx = 0; firstIdx < evt.path.length; firstIdx++)
+            if (evt.path[firstIdx] === '*' || evt.path[firstIdx] === '**')
                 break;
 
         //check permissions on prefix path
-        if (state.readPerms(state, payload.path.slice(0, firstIdx), evt.src).lvl<PERMS.VIEWER)
+        if (state.readPerms(state, evt.path.slice(0, firstIdx), evt.src).lvl<PERMS.VIEWER)
             throw new PermissionError('Not enough perms');
 
         //convert single event name to array for easier processing
@@ -40,13 +42,13 @@ module.exports = (on) => {
                 //todo prevent duplicates (e.g. sending it to yourself)
                 engine.emit([evtInner.name, evtInner.src, evt.src, ...evtInner.path], payloadInner);
             };
-            engine.on([evtNames[i], evtSrc, serverID, ...payload.path], listener);
+            engine.on([evtNames[i], evtSrc, serverID, ...evt.path], listener);
         }
 
         next(state);
     });
 
-    on(['unsubscribe', '*', serverID], (state, next, payload, engine) => {
+    on(['unsubscribe', '*', serverID, 'path', '**'], (state, next, payload, engine) => {
         payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //convert single event name to array for easier processing
@@ -58,7 +60,7 @@ module.exports = (on) => {
 
         //go through every event name listed
         for (let i = 0; i < evtNames.length; i++)
-            engine.removeAllListeners([evtNames[i], evtSrc, serverID, ...payload.path]);
+            engine.removeAllListeners([evtNames[i], evtSrc, serverID, ...evt.path]);
 
         next(state);
     });

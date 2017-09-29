@@ -1,5 +1,4 @@
 # todo
- 2. remove all direct sets
  1. deleted objects aren't cleaned up
  2. add semantic version to file
  4. security
