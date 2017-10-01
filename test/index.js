@@ -9,9 +9,9 @@ require('../index');
 // const toArr = require("../app/pathed.js").toArr;
 
 const testScript = fs.readFileSync('./testScript.js').toString();
-const ws = new WebSocket('ws://localhost:80');
-const ws2 = new WebSocket('ws://localhost:80');
-const ws3 = new WebSocket('ws://localhost:80');
+const ws = new WebSocket('ws://127.0.0.1:80');
+const ws2 = new WebSocket('ws://127.0.0.1:80');
+const ws3 = new WebSocket('ws://127.0.0.1:80');
 
 // const emt2 = new EventEmitter2();
 // const emt3 = new EventEmitter2();

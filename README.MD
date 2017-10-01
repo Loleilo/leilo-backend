@@ -2,6 +2,7 @@
  1. refactor everything to not use middleware - curr goal
  1. subscribe reset 
  1. use emit async to make sure evts run in order
+ 1. make 'tmp' objects, which server doesn't save
  1. add whitelist thing to sandbox
  1. evttables
  1. autocleanup

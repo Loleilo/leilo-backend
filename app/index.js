@@ -30,7 +30,7 @@ module.exports = () => {
     process.once('SIGINT', () => engine.emit(['serverExit', serverID, '*']));
     process.once('SIGUSR1', () => engine.emit(['serverExit', serverID, '*']));
     process.once('SIGUSR2', () => engine.emit(['serverExit', serverID, '*']));
-    // process.once('uncaughtException', () => engine.emit(['server_exit', serverID, '*']));
+    process.once('uncaughtException', () => engine.emit(['server_exit', serverID, '*']));
 
     engine.emit(["serverInit", serverID, serverID]);
 
