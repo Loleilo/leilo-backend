@@ -29,13 +29,13 @@ module.exports = (engine) => {
     });
 
 
-    engine.onM(['createUser', '*', serverID], (state, next, payload) => {
-        state.users[payload.username].scripts = {};
-        next(state);
+    engine.on(['createUser', '*', serverID], ( payload) => {
+        engine.state.users[payload.username].scripts = {};
     });
 
     //runs a script instance
-    engine.onM(['scriptStart', '*', serverID], (state, next, payload, evt) => {
+    engine.on(['scriptStart', '*', serverID], ( payload, evt) => {
+        const state=engine.state;
         const scriptInstanceID = payload.scriptInstanceID;
         const scripts = state.users[evt.src].scripts;
         const info = scripts[scriptInstanceID];
@@ -45,7 +45,7 @@ module.exports = (engine) => {
             engine.emit(['errorOccurred', serverID, evt.src], {
                 err: new Error('Script instance is already running')
             });
-            next(state);
+            return;
         }
         info.running = true;
 
@@ -141,12 +141,11 @@ module.exports = (engine) => {
             });
             engine.emit(['initRun', serverID, scriptInstanceID]);
         }
-
-        next(state);
     });
 
     //creates a script instance
-    engine.onM(['instantiateScript', '*', serverID], (state, next, payload, evt) => {
+    engine.on(['instantiateScript', '*', serverID], (payload, evt) => {
+        const state=engine.state;
         //todo only user can create scripts for now
         if (state.readUserLevel(state, evt.src) > 1) //todo replace 1 with constant
             throw new PermissionError('Not enough permissions to instantiate script');
@@ -174,7 +173,5 @@ module.exports = (engine) => {
         engine.emit(['scriptInstantiated', serverID, evt.src], {
             scriptInstanceID: scriptInstanceID,
         });
-
-        next(state);
     });
 };
