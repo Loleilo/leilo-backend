@@ -5,10 +5,10 @@ on({
     once({
         name: 'request_response',
         path: 'req1',
-        dst: 'leilo',
+        src: 'leilo',
     }, () => {
         emit({
-            name: 'gut content'
+            name: 'gudcontent'
         });
         emit({
             name: 'init_done'

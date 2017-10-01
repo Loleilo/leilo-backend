@@ -1,10 +1,10 @@
 # todo
- 1. better permission request system
- 1. remove all vars from code
  1. rename events so they don't have underscore
  1. subscribe reset
+ 1. add whitelist thing to sandbox
  1. if state reference is changed, events registered inside middleware will point to wrong instance
     - fix middleware thingy
+ 1. evttables
  1. autocleanup
  1. organize state tree
  1. make obj events universal (aka no converting except in engine)
