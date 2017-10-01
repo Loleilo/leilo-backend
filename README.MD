@@ -1,7 +1,6 @@
 # todo
- 1. subscribe reset
- 1. if state reference is changed, events registered inside middleware will point to wrong instance
-    - fix middleware thingy
+ 1. refactor everything to not use middleware - curr goal
+ 1. subscribe reset 
  1. use emit async to make sure evts run in order
  1. add whitelist thing to sandbox
  1. evttables

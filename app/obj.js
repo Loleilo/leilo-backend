@@ -14,8 +14,8 @@ const eng = new ObjPermsEngine({
     permsModule: config.permsModule,
 });
 
-module.exports = (on) => {
-    on(['serverInit', serverID, serverID], (state, next) => {
+module.exports = (engine) => {
+    engine.onM(['serverInit', serverID, serverID], (state, next) => {
         //give server root perms
         eng.u_updateUserLevel(serverID, state, eng.config.USER_LEVEL.ROOT);
 
@@ -34,27 +34,27 @@ module.exports = (on) => {
 
     //map server CRUD events to actual object modifications
 
-    on(['updateUserLevel', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
+    engine.onM(['updateUserLevel', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
         eng.updateUserLevel(evt.src, state, payload.user, payload.level);
         next(state);
     });
 
-    on(['create', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
+    engine.onM(['create', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
         eng.create(evt.src, state, evt.path, payload.newObjName, payload.newObjVal);
         next(state);
     });
 
-    on(['update', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
+    engine.onM(['update', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
         eng.update(evt.src, state, evt.path, payload.value);
         next(state);
     });
 
-    on(['delete', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
+    engine.onM(['delete', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
         eng.del(evt.src, state, evt.path);
         next(state);
     });
 
-    on(['updatePerms', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
+    engine.onM(['updatePerms', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
         eng.updatePerms(evt.src, state, evt.path, payload.user, payload.perms);
         next(state);
     });

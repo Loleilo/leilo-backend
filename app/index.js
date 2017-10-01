@@ -17,13 +17,13 @@ module.exports = () => {
     const engine = new Engine();
 
     if (config.persist)
-        engine.use(persist);
-    engine.use(obj);
-    engine.use(subscribe);
-    engine.use(user.middleware);
-    engine.use(scripts);
-    engine.use(wsConnector);
-    engine.use(debug);
+        persist(engine);
+    obj(engine);
+    subscribe(engine);
+    user.middleware(engine);
+    scripts(engine);
+    wsConnector(engine);
+    debug(engine);
 
     engine.once(['serverExit', serverID, serverID], () => process.exit());
     process.once('exit', () => engine.emit(['serverExit', serverID, '*']));

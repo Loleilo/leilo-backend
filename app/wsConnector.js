@@ -7,8 +7,8 @@ const Sandbox = require('./sandbox').Sandbox;
 let globalConnectionID = 0;
 
 //handles a client websocket connection
-module.exports = (on) => {
-    on(['serverInit', serverID, serverID], (state, next, payload, engine) => {
+module.exports = (engine) => {
+    engine.onM(['serverInit', serverID, serverID], (state, next) => {
         state.sandboxes={};
         const wss = new WebSocket.Server({port: 80});
         wss.on('connection', (ws) => {

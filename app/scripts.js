@@ -8,8 +8,8 @@ const toArr = require("./pathed.js").toArr;
 const PermissionError = require("obj-perms-engine").PermissionError;
 const PERMS = config.permsModule.PERMS;
 
-module.exports = (on) => {
-    on(['serverInit', serverID, serverID], (state, next, payload, engine) => {
+module.exports = (engine) => {
+    engine.onM(['serverInit', serverID, serverID], (state, next) => {
         //for each user
         for (const username in state.users) {
             if (!state.users.hasOwnProperty(username))continue;
@@ -29,13 +29,13 @@ module.exports = (on) => {
     });
 
 
-    on(['createUser', '*', serverID], (state, next, payload) => {
+    engine.onM(['createUser', '*', serverID], (state, next, payload) => {
         state.users[payload.username].scripts = {};
         next(state);
     });
 
     //runs a script instance
-    on(['scriptStart', '*', serverID], (state, next, payload, engine, evt) => {
+    engine.onM(['scriptStart', '*', serverID], (state, next, payload, evt) => {
         const scriptInstanceID = payload.scriptInstanceID;
         const scripts = state.users[evt.src].scripts;
         const info = scripts[scriptInstanceID];
@@ -146,7 +146,7 @@ module.exports = (on) => {
     });
 
     //creates a script instance
-    on(['instantiateScript', '*', serverID], (state, next, payload, engine, evt) => {
+    engine.onM(['instantiateScript', '*', serverID], (state, next, payload, evt) => {
         //todo only user can create scripts for now
         if (state.readUserLevel(state, evt.src) > 1) //todo replace 1 with constant
             throw new PermissionError('Not enough permissions to instantiate script');

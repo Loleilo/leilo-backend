@@ -38,7 +38,6 @@ class Engine extends EventEmitter2 {
                         next();
                     },
                     payload,
-                    this,
                     evt
                 )
             } catch (err) {
@@ -52,20 +51,12 @@ class Engine extends EventEmitter2 {
     }
 
     //registers a callback into the middleware chain
-    _onPending(evt, callback) {
+    onM(evt, callback) {
         this.pendingEmitter.on(evt, this._createHandler(callback))
     };
 
-    _oncePending(evt, callback) {
+    onceM(evt, callback) {
         this.pendingEmitter.once(evt, this._createHandler(callback))
-    }
-
-    //allows a middleware to register event callbacks
-    //middleware should follow interface (on)=>{...}
-    //callback passed on should follow interface (state, next, payload, emit, src, dst)=>{...}
-    use(middleware) {
-        //allow middleware to initialize with the on object
-        middleware(this._onPending, this._oncePending);
     }
 
     emit(evt, payload) {
@@ -88,7 +79,7 @@ class Engine extends EventEmitter2 {
         this.pendingEmitter.emit(evt, payload, toObj(evt));
     }
 
-    emitAsync(...args) {
+    emitNext(...args) {
         process.nextTick(() => this.emit(...args))
     }
 }

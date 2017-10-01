@@ -13,9 +13,9 @@ const defaultPayload = {
     src: '*',
 };
 
-module.exports = (on) => {
+module.exports = (engine) => {
     // allows a client to subscribe to state change events if they have read perms
-    on(['subscribe', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
+    engine.onM(['subscribe', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
         payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //find prefix of path that does not contain wildcards
@@ -48,7 +48,7 @@ module.exports = (on) => {
         next(state);
     });
 
-    on(['unsubscribe', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine) => {
+    engine.onM(['unsubscribe', '*', serverID, config.pathMarker, '**'], (state, next, payload) => {
         payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //convert single event name to array for easier processing

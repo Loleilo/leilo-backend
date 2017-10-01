@@ -2,8 +2,8 @@ const debugLevel = require('./config').debugLevel;
 const JSON = require('circular-json');
 //handles a client websocket connection
 require('colors');
-module.exports = (on) => {
-    on(['*', '*', '*', '**'], (state, next, payload, engine, evt) => {
+module.exports = (engine) => {
+    engine.onM(['*', '*', '*', '**'], (state, next, payload, evt) => {
         const color = evt.name === 'errorOccurred' ? 'red' : 'yellow';
         if (debugLevel === 'none')
             next(state);

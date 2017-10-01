@@ -4,8 +4,8 @@ const serverID = config.serverID;
 const d = require('./util').getDefault;
 const PERMS = config.permsModule.PERMS;
 
-module.exports.middleware = (on) => {
-    on(['serverInit', serverID, serverID], (state, next) => {
+module.exports.middleware = (engine) => {
+    engine.onM(['serverInit', serverID, serverID], (state, next) => {
         const defaultUsers = {};
         defaultUsers[serverID] = {
             passwordHash: PasswordHash.generate(config.serverDefaultPassword),
@@ -17,7 +17,7 @@ module.exports.middleware = (on) => {
     });
 
     //todo remember to add this to evttables
-    on(['createUser', '*', serverID], (state, next, payload) => {
+    engine.onM(['createUser', '*', serverID], (state, next, payload) => {
         if (state.passwordHashes[payload.username] !== undefined)
             throw new Error('User already exists');
 
@@ -37,7 +37,7 @@ module.exports.middleware = (on) => {
         next(state);
     });
 
-    on(['changePassword', '*', serverID], (state, next, payload, engine, evt) => {
+    engine.onM(['changePassword', '*', serverID], (state, next, payload, evt) => {
         state.passwordHashes[evt.src] = {
             passwordHash: PasswordHash.generate(payload.password)
         };
@@ -45,7 +45,7 @@ module.exports.middleware = (on) => {
         next(state);
     });
 
-    on(['deleteUser', '*', serverID], (state, next, payload, engine, evt) => {
+    engine.onM(['deleteUser', '*', serverID], (state, next, payload, evt) => {
         //todo make sure to disconnect user on delete, also to clean up user perms
         state.passwordHashes[evt.src] = null;
 
