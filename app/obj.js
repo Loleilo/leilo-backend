@@ -15,7 +15,8 @@ const eng = new ObjPermsEngine({
 });
 
 module.exports = (engine) => {
-    engine.onM(['serverInit', serverID, serverID], (state, next) => {
+    engine.on(['serverInit', serverID, serverID], () => {
+        const state = engine.state;
         //give server root perms
         eng.u_updateUserLevel(serverID, state, eng.config.USER_LEVEL.ROOT);
 
@@ -27,35 +28,28 @@ module.exports = (engine) => {
         state.updateUserLevel = eng.updateUserLevel;
         state.updatePerms = eng.updatePerms;
         state.updatePerm = eng.updatePerm;
-
-        next(state);
     });
 
 
     //map server CRUD events to actual object modifications
 
-    engine.onM(['updateUserLevel', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
-        eng.updateUserLevel(evt.src, state, payload.user, payload.level);
-        next(state);
+    engine.on(['updateUserLevel', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        eng.updateUserLevel(evt.src, engine.state, payload.user, payload.level);
     });
 
-    engine.onM(['create', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
-        eng.create(evt.src, state, evt.path, payload.newObjName, payload.newObjVal);
-        next(state);
+    engine.on(['create', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        eng.create(evt.src, engine.state, evt.path, payload.newObjName, payload.newObjVal);
     });
 
-    engine.onM(['update', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
-        eng.update(evt.src, state, evt.path, payload.value);
-        next(state);
+    engine.on(['update', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        eng.update(evt.src, engine.state, evt.path, payload.value);
     });
 
-    engine.onM(['delete', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
-        eng.del(evt.src, state, evt.path);
-        next(state);
+    engine.on(['delete', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        eng.del(evt.src, engine.state, evt.path);
     });
 
-    engine.onM(['updatePerms', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
-        eng.updatePerms(evt.src, state, evt.path, payload.user, payload.perms);
-        next(state);
+    engine.on(['updatePerms', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        eng.updatePerms(evt.src, engine.state, evt.path, payload.user, payload.perms);
     });
 };
