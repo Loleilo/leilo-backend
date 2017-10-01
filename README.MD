@@ -1,5 +1,4 @@
 # todo
- 1. rename events so they don't have underscore
  1. subscribe reset
  1. add whitelist thing to sandbox
  1. if state reference is changed, events registered inside middleware will point to wrong instance

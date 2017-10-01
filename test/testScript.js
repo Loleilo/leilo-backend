@@ -4,7 +4,7 @@ on({
 }, () => {
     once({
         name: 'requestResponse',
-        path: 'req1',
+        path: ['req1'],
         src: 'leilo',
     }, () => {
         emit({
@@ -16,13 +16,12 @@ on({
     });
     emit({
         name: 'requestElevated',
-        path: 'req1',
+        path: ['req1'],
         dst: 'leilo',
     }, {
         evt:{
-            name: "yay",
-            path: ['lol']
-        }
+            name: "yay222",
+        },
     });
 });
 emit({

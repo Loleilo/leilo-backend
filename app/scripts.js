@@ -90,6 +90,11 @@ module.exports = (on) => {
 
                 //removed accepted request
                 info.requestQueue = info.requestQueue.slice(1);
+
+                //allow user to fake accept
+                if(lst[i]==='skip')
+                    lst[i]='accept';
+
                 //tell script that request has beeen accepted
                 engine.emit(['requestResponse', serverID, scriptInstanceID, config.pathMarker, reqID], lst[i]);
             }
