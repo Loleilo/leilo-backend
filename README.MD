@@ -1,5 +1,5 @@
 # todo
- 1. refactor everything to not use middleware - curr goal
+ - check what causes errors not to be shown
  1. subscribe reset 
  1. use emit async to make sure evts run in order
  1. make 'tmp' objects, which server doesn't save

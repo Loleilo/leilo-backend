@@ -45,6 +45,17 @@ module.exports = (engine) => {
             };
             engine.on([evtNames[i], evtSrc, serverID, ...evt.path], listener);
         }
+
+        //init subscriber
+        engine.emit(['subscribe_init', evt.src, serverID, config.pathMarker, ...evt.path]);
+    });
+
+    //event is used to initially load the state into client
+    engine.on(['subscribe_init', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        const state = engine.state;
+        engine.emit(['update', serverID, evt.src, config.pathMarker, ...evt.path], {
+            value: state.read(evt.src, state, evt.path)
+        });
     });
 
     engine.on(['unsubscribe', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
