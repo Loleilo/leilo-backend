@@ -8,8 +8,9 @@ let globalConnectionID = 0;
 
 //handles a client websocket connection
 module.exports = (engine) => {
-    engine.onM(['serverInit', serverID, serverID], (state, next) => {
-        state.sandboxes={};
+    engine.on(['serverInit', serverID, serverID], () => {
+        const state = engine.state;
+        state.sandboxes = {};
         const wss = new WebSocket.Server({port: 80});
         wss.on('connection', (ws) => {
             globalConnectionID++;
@@ -63,7 +64,7 @@ module.exports = (engine) => {
 
                     //create sandbox for client
                     const clientSandbox = new Sandbox(engine, currClientID);
-                    state.sandboxes[currClientID]=clientSandbox;
+                    state.sandboxes[currClientID] = clientSandbox;
 
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {
@@ -105,7 +106,5 @@ module.exports = (engine) => {
 
             autoDisconnectAddListener(ws, 'message', messageHandler, currConnectionID, true);
         });
-
-        next(state);
     })
 };
