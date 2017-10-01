@@ -17,7 +17,9 @@ module.exports.middleware = (engine) => {
     });
 
     //todo remember to add this to evttables
-    engine.onM(['createUser', '*', serverID], (state, next, payload) => {
+    engine.on(['createUser', '*', serverID], (payload) => {
+        const state = engine.state;
+
         if (state.passwordHashes[payload.username] !== undefined)
             throw new Error('User already exists');
 
@@ -33,23 +35,16 @@ module.exports.middleware = (engine) => {
 
         //give user level
         state.updateUserLevel(serverID, state, payload.username, 1);//todo replace 1 with constant
-
-        next(state);
     });
 
-    engine.onM(['changePassword', '*', serverID], (state, next, payload, evt) => {
-        state.passwordHashes[evt.src] = {
+    engine.on(['changePassword', '*', serverID], (payload, evt) => {
+        engine.state.passwordHashes[evt.src] = {
             passwordHash: PasswordHash.generate(payload.password)
         };
-
-        next(state);
     });
 
-    engine.onM(['deleteUser', '*', serverID], (state, next, payload, evt) => {
-        //todo make sure to disconnect user on delete, also to clean up user perms
-        state.passwordHashes[evt.src] = null;
-
-        next(state);
+    engine.on(['deleteUser', '*', serverID], (payload, evt) => {
+        engine.state.passwordHashes[evt.src] = null;
     });
 };
 
