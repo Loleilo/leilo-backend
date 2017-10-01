@@ -45,7 +45,7 @@ const scriptTest = () => {
             },
             payload: {
                 firstReqID: 'req1',
-                responseLst: ["accept"],
+                responseLst: ["accept", "reject", "skip"],
             },
         });
     }, 500);

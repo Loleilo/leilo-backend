@@ -67,10 +67,10 @@ module.exports = (on) => {
 
         //detect when user accepts
         engine.on(['requestAccepted', info.parentID, scriptInstanceID], (payload) => {
-            let lst=payload.responseLst;
+            let lst = payload.responseLst;
 
-            if (info.requestQueue[0].length===0) {
-                engine.emit(['errorOccurred', serverID, info.parentID], {err: new Error('Empty request queue')});
+            if (info.requestQueue.length < lst.length) {
+                engine.emit(['errorOccurred', serverID, info.parentID], {err: new Error('More answers than requests')});
                 return;
             }
 
@@ -81,22 +81,26 @@ module.exports = (on) => {
             }
 
             //payload is list of accept/reject indicators
-            for (let i = 0; i < lst.length; i++) {
-                const reqID = info.requestQueue[i].reqID;
-                const req = info.requestQueue[i].request;
+            while (lst.length > 0) {
+                const reqID = info.requestQueue[0].reqID;
+                const req = info.requestQueue[0].request;
 
-                if (lst[i] === 'accept')
-                    state.sandboxes[info.parentID].interface.emit(req.evt, req.payload);
+                //store res
+                let ans = lst[0];
 
-                //removed accepted request
+                //remove from lists
+                lst = lst.slice(1);
                 info.requestQueue = info.requestQueue.slice(1);
 
+                if (ans === 'accept')
+                    state.sandboxes[info.parentID].interface.emit(req.evt, req.payload);
+
                 //allow user to fake accept
-                if(lst[i]==='skip')
-                    lst[i]='accept';
+                if (ans === 'skip')
+                    ans = 'accept';
 
                 //tell script that request has beeen accepted
-                engine.emit(['requestResponse', serverID, scriptInstanceID, config.pathMarker, reqID], lst[i]);
+                engine.emit(['requestResponse', serverID, scriptInstanceID, config.pathMarker, reqID], ans);
             }
         });
 
@@ -116,7 +120,7 @@ module.exports = (on) => {
             });
 
             //also emit actual evt
-            engine.emit(['requestElevated', scriptInstanceID, info.parentID, 'path', ...evt.path], payload);
+            engine.emit(['requestElevated', scriptInstanceID, info.parentID, config.pathMarker, ...evt.path], payload);
         });
 
         //choose which code to run

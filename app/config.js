@@ -27,5 +27,5 @@ module.exports = {
 
     persist: false, //whether to save server changes
 
-    debugLevel: "short", // can be none, short, normal, or verbose
+    debugLevel: "normal", // can be none, short, normal, or verbose
 };
