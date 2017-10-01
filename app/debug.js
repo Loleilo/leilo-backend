@@ -3,10 +3,10 @@ const JSON = require('circular-json');
 //handles a client websocket connection
 require('colors');
 module.exports = (engine) => {
-    engine.onM(['*', '*', '*', '**'], (state, next, payload, evt) => {
+    engine.on(['*', '*', '*', '**'], (payload, evt) => {
         const color = evt.name === 'errorOccurred' ? 'red' : 'yellow';
         if (debugLevel === 'none')
-            next(state);
+           return;
         else if (debugLevel === 'short') {
             console.log(("Event occurred:" + evt.name
                 + '\n' + ' direction: ' + evt.src + '->' + evt.dst
@@ -28,6 +28,5 @@ module.exports = (engine) => {
         }
         if (color === 'red')
             console.log(payload.err.message.red);
-        next(state);
     });
 };
