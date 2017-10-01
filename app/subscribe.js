@@ -15,7 +15,8 @@ const defaultPayload = {
 
 module.exports = (engine) => {
     // allows a client to subscribe to state change events if they have read perms
-    engine.onM(['subscribe', '*', serverID, config.pathMarker, '**'], (state, next, payload, evt) => {
+    engine.on(['subscribe', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        const state = engine.state;
         payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //find prefix of path that does not contain wildcards
@@ -25,7 +26,7 @@ module.exports = (engine) => {
                 break;
 
         //check permissions on prefix path
-        if (state.readPerms(state, evt.path.slice(0, firstIdx), evt.src).lvl<PERMS.VIEWER)
+        if (state.readPerms(state, evt.path.slice(0, firstIdx), evt.src).lvl < PERMS.VIEWER)
             throw new PermissionError('Not enough perms');
 
         //convert single event name to array for easier processing
@@ -44,11 +45,10 @@ module.exports = (engine) => {
             };
             engine.on([evtNames[i], evtSrc, serverID, ...evt.path], listener);
         }
-
-        next(state);
     });
 
-    engine.onM(['unsubscribe', '*', serverID, config.pathMarker, '**'], (state, next, payload) => {
+    engine.on(['unsubscribe', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+        const state = engine.state;
         payload = Object.assign({}, defaultPayload, payload); //default perms
 
         //convert single event name to array for easier processing
@@ -61,7 +61,5 @@ module.exports = (engine) => {
         //go through every event name listed
         for (let i = 0; i < evtNames.length; i++)
             engine.removeAllListeners([evtNames[i], evtSrc, serverID, ...evt.path]);
-
-        next(state);
     });
 };
