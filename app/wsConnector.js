@@ -8,13 +8,13 @@ let globalConnectionID = 0;
 
 //handles a client websocket connection
 module.exports = (on) => {
-    on(['server_init', serverID, serverID], (state, next, payload, engine) => {
+    on(['serverInit', serverID, serverID], (state, next, payload, engine) => {
         state.sandboxes={};
         const wss = new WebSocket.Server({port: 80});
         wss.on('connection', (ws) => {
             globalConnectionID++;
-            const currConnectionID = "connection_" + globalConnectionID;
-            ws.send(`try_auth ${config.version}`);
+            const currConnectionID = "connection#" + globalConnectionID;
+            ws.send(`tryAuth ${config.version}`);
 
             //auto disconnects on implicit disconnect (socket closed without warning)
             const autoDisconnectAddListener = (emitter, evt, listener, id, once = false) => {
@@ -23,7 +23,7 @@ module.exports = (on) => {
                     if (ws.readyState !== WebSocket.OPEN) {
                         if (ws.disconnectEmitted)return;
                         ws.disconnectEmitted = true;
-                        engine.emit(['client_disconnected', id, serverID]);
+                        engine.emit(['clientDisconnected', id, serverID]);
                     } else listener(...args);
                 };
 
@@ -35,12 +35,12 @@ module.exports = (on) => {
                 if (typeof(actualFunc) !== 'function') actualFunc = listenerWrapped;
 
                 //handler removes the listener
-                engine.once(['client_disconnected', id, serverID],
+                engine.once(['clientDisconnected', id, serverID],
                     () => emitter.removeListener(evt, actualFunc));
             };
 
             //display disconnected message
-            engine.once(['client_disconnected', currConnectionID, currConnectionID], () => {
+            engine.once(['clientDisconnected', currConnectionID, currConnectionID], () => {
                 console.log(`Client @${currConnectionID} disconnected`);
             });
 
@@ -49,13 +49,13 @@ module.exports = (on) => {
                 try {
                     msg = JSON.parse(data);
                 } catch (err) {
-                    engine.emit(['error_occurred', currConnectionID, serverID], {
+                    engine.emit(['errorOccurred', currConnectionID, serverID], {
                         err: new Error("Couldn't parse JSON")
                     });
                 }
 
                 if (msg !== undefined && isValidLogin(engine.state, msg)) {
-                    ws.send(`auth_successful`); //send indicator
+                    ws.send(`authSuccessful`); //send indicator
 
                     //store current client username
                     const currClientID = msg.username;
@@ -71,7 +71,7 @@ module.exports = (on) => {
                             const msg = JSON.parse(message);
                             clientSandbox.interface.emit(msg.evt, msg.payload);
                         } catch (err) {
-                            engine.emit(['error_occurred', currClientID, currClientID], {
+                            engine.emit(['errorOccurred', currClientID, currClientID], {
                                 err: new Error("Couldn't parse JSON")
                             });
                         }
@@ -96,9 +96,9 @@ module.exports = (on) => {
                     }, serverEvtHandler, currConnectionID);
 
                     //send client connected event
-                    engine.emit(['client_connected', serverID, serverID], undefined, currClientID);
+                    engine.emit(['clientConnected', serverID, serverID], undefined, currClientID);
                 } else {
-                    ws.send(`auth_rejected`);
+                    ws.send(`authRejected`);
                     ws.close();
                 }
             };

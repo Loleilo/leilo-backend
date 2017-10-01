@@ -43,7 +43,7 @@ class Engine extends EventEmitter2 {
                 )
             } catch (err) {
                 console.log(err);
-                this.emit(['error_occurred', serverID, evt.src], {
+                this.emit(['errorOccurred', serverID, evt.src], {
                     err: err,
                     srcEvent: evt
                 });
@@ -73,7 +73,7 @@ class Engine extends EventEmitter2 {
         if (evt === 'newListener' || evt==='removeListener')return;
 
         if (!Array.isArray(evt) || evtType(evt) === 'invalid') {
-            this.emit(['error_occurred', serverID, serverID], {
+            this.emit(['errorOccurred', serverID, serverID], {
                 err: new Error('Invalid event'),
                 srcEvt: evt,
             });

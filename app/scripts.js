@@ -9,7 +9,7 @@ const PermissionError = require("obj-perms-engine").PermissionError;
 const PERMS = config.permsModule.PERMS;
 
 module.exports = (on) => {
-    on(['server_init', serverID, serverID], (state, next, payload, engine) => {
+    on(['serverInit', serverID, serverID], (state, next, payload, engine) => {
         //for each user
         for (const username in state.users) {
             if (!state.users.hasOwnProperty(username))continue;
@@ -19,7 +19,7 @@ module.exports = (on) => {
             for (const script in user.scripts) {
                 if (!user.scripts.hasOwnProperty(script)) continue;
                 user.scripts[script].running = false;
-                engine.emit(['script_start', serverID, serverID], {
+                engine.emit(['scriptStart', serverID, serverID], {
                     scriptInstanceID: script
                 });
             }
@@ -29,20 +29,20 @@ module.exports = (on) => {
     });
 
 
-    on(['create_user', '*', serverID], (state, next, payload) => {
+    on(['createUser', '*', serverID], (state, next, payload) => {
         state.users[payload.username].scripts = {};
         next(state);
     });
 
     //runs a script instance
-    on(['script_start', '*', serverID], (state, next, payload, engine, evt) => {
+    on(['scriptStart', '*', serverID], (state, next, payload, engine, evt) => {
         const scriptInstanceID = payload.scriptInstanceID;
         const scripts = state.users[evt.src].scripts;
         const info = scripts[scriptInstanceID];
 
         //prevent script from running twice
         if (info.running) {
-            engine.emit(['error_occurred', serverID, evt.src], {
+            engine.emit(['errorOccurred', serverID, evt.src], {
                 err: new Error('Script instance is already running')
             });
             next(state);
@@ -66,17 +66,17 @@ module.exports = (on) => {
             config.globalVMOptions));
 
         //detect when user accepts
-        engine.on(['request_accepted', info.parentID, scriptInstanceID], (payload) => {
+        engine.on(['requestAccepted', info.parentID, scriptInstanceID], (payload) => {
             let lst=payload.responseLst;
 
             if (info.requestQueue[0].length===0) {
-                engine.emit(['error_occurred', serverID, info.parentID], {err: new Error('Empty request queue')});
+                engine.emit(['errorOccurred', serverID, info.parentID], {err: new Error('Empty request queue')});
                 return;
             }
 
             //concurrency safe check
             if (info.requestQueue[0].reqID !== payload.firstReqID) {
-                engine.emit(['error_occurred', serverID, info.parentID], {err: new Error('First reqID mismatch')});
+                engine.emit(['errorOccurred', serverID, info.parentID], {err: new Error('First reqID mismatch')});
                 return;
             }
 
@@ -91,12 +91,12 @@ module.exports = (on) => {
                 //removed accepted request
                 info.requestQueue = info.requestQueue.slice(1);
                 //tell script that request has beeen accepted
-                engine.emit(['request_response', serverID, scriptInstanceID, config.pathMarker, reqID], lst[i]);
+                engine.emit(['requestResponse', serverID, scriptInstanceID, config.pathMarker, reqID], lst[i]);
             }
         });
 
         //setup event for script to request an evt to be send as parent user
-        engine.on(['request_elevated', scriptInstanceID, serverID, config.pathMarker, '*'], (payload, evt) => {
+        engine.on(['requestElevated', scriptInstanceID, serverID, config.pathMarker, '*'], (payload, evt) => {
             //update request queue
             engine.emit(toArr({
                 name: 'update',
@@ -111,7 +111,7 @@ module.exports = (on) => {
             });
 
             //also emit actual evt
-            engine.emit(['request_elevated', scriptInstanceID, info.parentID, 'path', ...evt.path], payload);
+            engine.emit(['requestElevated', scriptInstanceID, info.parentID, 'path', ...evt.path], payload);
         });
 
         //choose which code to run
@@ -126,18 +126,18 @@ module.exports = (on) => {
         //if first run of script, call script init func
         if (info.needInit) {
             // script should emit init_done when setup is done
-            engine.once(['init_done', scriptInstanceID, serverID], () => {
+            engine.once(['initDone', scriptInstanceID, serverID], () => {
                 info.needInit = false;
-                engine.emit(['script_init_done', scriptInstanceID, info.parentID]);
+                engine.emit(['scriptInitDone', scriptInstanceID, info.parentID]);
             });
-            engine.emit(['init_run', serverID, scriptInstanceID]);
+            engine.emit(['initRun', serverID, scriptInstanceID]);
         }
 
         next(state);
     });
 
     //creates a script instance
-    on(['instantiate_script', '*', serverID], (state, next, payload, engine, evt) => {
+    on(['instantiateScript', '*', serverID], (state, next, payload, engine, evt) => {
         //todo only user can create scripts for now
         if (state.readUserLevel(state, evt.src) > 1) //todo replace 1 with constant
             throw new PermissionError('Not enough permissions to instantiate script');
@@ -156,13 +156,13 @@ module.exports = (on) => {
         });
 
         //run script
-        engine.emit(['script_start', evt.src, serverID], {
+        engine.emit(['scriptStart', evt.src, serverID], {
             scriptInstanceID: scriptInstanceID,
         });
 
         //send new script id back to user
         //todo script is not really instantiated yet
-        engine.emit(['script_instantiated', serverID, evt.src], {
+        engine.emit(['scriptInstantiated', serverID, evt.src], {
             scriptInstanceID: scriptInstanceID,
         });
 

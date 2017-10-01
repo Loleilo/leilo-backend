@@ -29,7 +29,7 @@ const s3 = (js) => {
 const scriptTest = () => {
     s3({
         evt: {
-            name: "instantiate_script",
+            name: "instantiateScript",
             dst: serverID,
         },
         payload: {
@@ -40,7 +40,7 @@ const scriptTest = () => {
     setTimeout(() => {
         s3({
             evt: {
-                name: "request_accepted",
+                name: "requestAccepted",
                 dst: '*',
             },
             payload: {
@@ -48,7 +48,7 @@ const scriptTest = () => {
                 responseLst: ["accepted"],
             },
         });
-    }, 1000);
+    }, 500);
 };
 
 const openHandler = () => {
@@ -59,7 +59,7 @@ const openHandler = () => {
 
     s1({
         evt: {
-            name: 'create_user',
+            name: 'createUser',
             dst: serverID,
         },
         payload: {
@@ -86,7 +86,7 @@ const openHandler = () => {
 
     s2({
         evt: {
-            name: 'create_user',
+            name: 'createUser',
             dst: serverID,
         },
         payload: {

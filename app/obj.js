@@ -15,7 +15,7 @@ const eng = new ObjPermsEngine({
 });
 
 module.exports = (on) => {
-    on(['server_init', serverID, serverID], (state, next) => {
+    on(['serverInit', serverID, serverID], (state, next) => {
         //give server root perms
         eng.u_updateUserLevel(serverID, state, eng.config.USER_LEVEL.ROOT);
 

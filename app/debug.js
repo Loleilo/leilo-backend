@@ -4,7 +4,7 @@ const JSON = require('circular-json');
 require('colors');
 module.exports = (on) => {
     on(['*', '*', '*', '**'], (state, next, payload, engine, evt) => {
-        const color=evt.name==='error_occurred'?'red':'yellow';
+        const color=evt.name==='errorOccurred'?'red':'yellow';
         if(debugLevel==='none')
             next(state);
         else if(debugLevel==='short'){

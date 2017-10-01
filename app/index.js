@@ -25,14 +25,14 @@ module.exports = () => {
     engine.use(wsConnector);
     engine.use(debug);
 
-    engine.once(['server_exit', serverID, serverID], () => process.exit());
-    process.once('exit', () => engine.emit(['server_exit', serverID, '*']));
-    process.once('SIGINT', () => engine.emit(['server_exit', serverID, '*']));
-    process.once('SIGUSR1', () => engine.emit(['server_exit', serverID, '*']));
-    process.once('SIGUSR2', () => engine.emit(['server_exit', serverID, '*']));
+    engine.once(['serverExit', serverID, serverID], () => process.exit());
+    process.once('exit', () => engine.emit(['serverExit', serverID, '*']));
+    process.once('SIGINT', () => engine.emit(['serverExit', serverID, '*']));
+    process.once('SIGUSR1', () => engine.emit(['serverExit', serverID, '*']));
+    process.once('SIGUSR2', () => engine.emit(['serverExit', serverID, '*']));
     // process.once('uncaughtException', () => engine.emit(['server_exit', serverID, '*']));
 
-    engine.emit(["server_init", serverID, serverID]);
+    engine.emit(["serverInit", serverID, serverID]);
 
     console.log("Server is running");
 };

@@ -1,9 +1,9 @@
 on({
-    name: 'init_run',
+    name: 'initRun',
     src: '*'
 }, () => {
     once({
-        name: 'request_response',
+        name: 'requestResponse',
         path: 'req1',
         src: 'leilo',
     }, () => {
@@ -11,11 +11,11 @@ on({
             name: 'gudcontent'
         });
         emit({
-            name: 'init_done'
+            name: 'initDone'
         });
     });
     emit({
-        name: 'request_elevated',
+        name: 'requestElevated',
         path: 'req1',
         dst: 'leilo',
     }, {
