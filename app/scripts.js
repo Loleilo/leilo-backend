@@ -29,9 +29,9 @@ module.exports = (on) => {
     });
 
 
-    on(['create_user', serverID, serverID], (state, next, payload) => {
-        next(state);
+    on(['create_user', '*', serverID], (state, next, payload) => {
         state.users[payload.username].scripts = {};
+        next(state);
     });
 
     //runs a script instance
@@ -66,26 +66,32 @@ module.exports = (on) => {
             config.globalVMOptions));
 
         //detect when user accepts
-        engine.on(['request_accepted', info.parentID, serverID], (payload) => {
+        engine.on(['request_accepted', info.parentID, scriptInstanceID], (payload) => {
             if (!Array.isArray(payload))
                 payload = [payload];
+
+            if (info.requestQueue[i].reqID !== payload.firstReqID) {
+                engine.emit(['error_occurred', serverID, info.parentID], {err: new Error('First reqID mismatch')});
+                return;
+            }
 
             //payload is list of accept/reject indicators
             for (let i = 0; i < payload.length; i++) {
                 const reqID = info.requestQueue[i].reqID;
-                const req=info.requestQueue[i].request;
+                const req = info.requestQueue[i].request;
 
-                state.sandboxes[info.parentID].interface.emit(req.evt, req.payload);
+                if (payload[i] === 'accept')
+                    state.sandboxes[info.parentID].interface.emit(req.evt, req.payload);
 
                 //removed accepted request
                 info.requestQueue = info.requestQueue.slice(1);
                 //tell script that request has beeen accepted
-                engine.emit(['request_response', serverID, scriptInstanceID, 'path', reqID], payload[i]);
+                engine.emit(['request_response', serverID, scriptInstanceID, config.pathMarker, reqID], payload[i]);
             }
         });
 
         //setup event for script to request an evt to be send as parent user
-        engine.on(['request_elevated', scriptInstanceID, serverID, 'path', '*'], (payload, evt) => {
+        engine.on(['request_elevated', scriptInstanceID, serverID, config.pathMarker, '*'], (payload, evt) => {
             //update request queue
             engine.emit(toArr({
                 name: 'update',

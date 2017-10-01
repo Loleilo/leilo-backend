@@ -4,8 +4,8 @@ const a = Object.assign;
 
 const defaultOptions = {
     allowRemoveAllListeners: false,
-    forceSrc: true,
-    forceDst: true,
+    forceSendIdentity: true,
+    forceReceiveIdentity: true,
 };
 
 class SandboxError extends Error {
@@ -28,62 +28,59 @@ class Sandbox {
 
         this.disabled = false;
 
-        //expose wrapped functions in single interface
-        this.interface = {
-            emit: this._sandboxify(this._emit),
-            on: this._sandboxify(this._on),
-            once: this._sandboxify(this._once),
-            removeListener: this._sandboxify(this._removeListener),
-        };
+        try {
+            //expose wrapped functions in single interface
+            this.interface = {
+                emit: this._sandboxify(this._emit, "src"),
+                on: this._sandboxify(this._on),
+                once: this._sandboxify(this._once),
+                removeListener: this._sandboxify(this._removeListener),
+            };
+        }catch(e){
+            console.log(e);
+        }
 
         if (options.allowRemoveAllListeners)
             this.removeAllListeners = this._sandboxify(this._removeAllListeners);
     }
 
     //wraps a function with some checks
-    _sandboxify(func) {
-        return ( ...args) => {
+    _sandboxify(func, dir="dst") {
+        return (evt, ...args) => {
             if (this.disabled)
                 throw new SandboxError('Interface disabled');
-            return func(...args);
+            if(dir==='src')
+                if (this.options.forceSendIdentity) evt = a(evt, {
+                    src: this._userID // force src to be this user
+                });
+            if(dir==="dst")
+                if (this.options.forceReceiveIdentity) evt = a(evt, {
+                    dst: this._userID // force dst to be this user
+                });
+            return func(_scopeDst(evt), ...args);
         };
     }
 
-    //scoped emit and on functions
+    //scoped emit and on functions todo idk why this is needed (causes error if not used)
 
     _emit(evt, payload) {
-        if (this.options.forceSrc) evt = a(evt, {
-            src: this._userID // force src to be this user
-        });
-        this._engine.emit(_scopeDst(evt), payload);
+        this._engine.emit(evt, payload);
     }
 
     _on(evt, callback) {
-        if (this.options.forceDst) evt = a(evt, {
-            dst: this._userID // force dst to be this user
-        });
-        this._engine.on(_scopeDst(evt), callback);
+        this._engine.on(evt, callback);
     }
 
     _once(evt, callback) {
-        if (this.options.forceDst) evt = a(evt, {
-            dst: this._userID // force dst to be this user
-        });
-        this._engine.once(_scopeDst(evt), callback);
+        this._engine.once(evt, callback);
     }
 
     _removeListener(evt, callback) {
-        if (this.options.forceDst) evt = a(evt, {
-            dst: this._userID // force dst to be this user
-        });
-        this._engine.removeListener(_scopeDst(evt), callback);
+        this._engine.removeListener(evt, callback);
     }
 
     _removeAllListeners(evt) {
-        if (this.options.forceDst) evt = a(evt, {
-            dst: this._userID // force dst to be this user
-        });
-        this._engine.removeAllListeners(_scopeDst(evt));
+        this._engine.removeAllListeners(evt);
     }
 }
 

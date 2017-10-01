@@ -9,17 +9,20 @@ const testscript = fs.readFileSync('./testscript.js').toString();
 require('../index');
 const ws = new WebSocket('ws://localhost:80');
 const ws2 = new WebSocket('ws://localhost:80');
+const ws3=new WebSocket('ws://localhost:80');
 
 const s1 = (js) => {
     ws.send(JSON.stringify(js));
 };
-
 const s2 = (js) => {
     ws2.send(JSON.stringify(js));
 };
+const s3 = (js) => {
+    ws3.send(JSON.stringify(js));
+};
 
 const scriptTest = () => {
-    s2({
+    s3({
         evt: {
             name: "instantiate_script",
             dst: serverID,
@@ -30,6 +33,14 @@ const scriptTest = () => {
             }
         }
     });
+    setTimeout(()=>{
+        s3({
+            evt:{
+                name: "request_accepted",
+                dst: serverID,
+            }
+        });
+    },1000);
 };
 
 const openHandler = () => {
@@ -40,7 +51,35 @@ const openHandler = () => {
 
     s1({
         evt: {
-            name: 'create_user'
+            name: 'create_user',
+            dst: serverID,
+        },
+        payload: {
+            username: 'root',
+            password: 'pass'
+        }
+    });
+
+    s1({
+        evt: {
+            name: 'updateUserLevel',
+            dst: serverID,
+        },
+        payload: {
+            user: 'root',
+            level: 0,
+        }
+    });
+
+    s2({
+        username: 'root',
+        password: 'pass'
+    });
+
+    s2({
+        evt: {
+            name: 'create_user',
+            dst: serverID,
         },
         payload: {
             username: 'sunny',
@@ -48,7 +87,7 @@ const openHandler = () => {
         }
     });
 
-    s2({
+    s3({
         username: 'sunny',
         password: 'pass'
     });
@@ -57,10 +96,11 @@ const openHandler = () => {
 
 };
 
-const wrapped = waitAll(openHandler, 2);
+const wrapped = waitAll(openHandler, 3);
 
 ws.on('open', wrapped[0]);
 ws2.on('open', wrapped[1]);
+ws3.on('open', wrapped[2]);
 
-ws.on('message', (msg) => console.log(msg.green));
+ws3.on('message', (msg) => console.log(msg.green));
 ws2.on('message', (msg) => console.log(msg.blue));

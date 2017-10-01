@@ -16,7 +16,8 @@ module.exports.middleware = (on) => {
         next(state);
     });
 
-    on(['create_user', serverID, serverID], (state, next, payload) => {
+    //todo remember to add this to evttables
+    on(['create_user', '*', serverID], (state, next, payload) => {
         if (state.passwordHashes[payload.username] !== undefined)
             throw new Error('User already exists');
 

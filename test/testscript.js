@@ -4,16 +4,20 @@ on({
 }, () => {
     once({
         name: 'request_response',
-        path: 'req1'
+        path: 'req1',
+        dst: 'leilo',
     }, () => {
-        console.log('gud content 1');
+        emit({
+            name: 'gut content'
+        });
         emit({
             name: 'init_done'
         });
     });
     emit({
         name: 'request_elevated',
-        path: 'req1'
+        path: 'req1',
+        dst: 'leilo',
     }, {
         evt:{
             name: "yay",

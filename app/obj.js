@@ -34,6 +34,11 @@ module.exports = (on) => {
 
     //map server CRUD events to actual object modifications
 
+    on(['updateUserLevel', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
+        eng.updateUserLevel(evt.src, state, payload.user, payload.level);
+        next(state);
+    });
+
     on(['create', '*', serverID, config.pathMarker, '**'], (state, next, payload, engine, evt) => {
         eng.create(evt.src, state, evt.path, payload.newObjName, payload.newObjVal);
         next(state);

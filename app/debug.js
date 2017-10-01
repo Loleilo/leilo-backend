@@ -27,6 +27,8 @@ module.exports = (on) => {
                 + '\n' + ' state:' + JSON.stringify(state))[color]
             );
         }
+        if(color==='red')
+            console.log(payload.err.message.red);
         next(state);
     });
 };

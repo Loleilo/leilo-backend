@@ -1,11 +1,18 @@
 # todo
- 1. if state reference is changed, events registered inside middleware will point to wrong instance
  1. better permission request system
- 1. deleted objects aren't cleaned up
+ 1. remove all vars from code
+ 1. rename events so they don't have underscore
+ 1. subscribe reset
+ 1. if state reference is changed, events registered inside middleware will point to wrong instance
+    - fix middleware thingy
+ 1. autocleanup
+ 1. organize state tree
+ 1. make obj events universal (aka no converting except in engine)
  2. add semantic version to file
  4. security
  3. Parameter checking system
  1. Create api map (documentation)
+ 1. think about sandboxing server code
  
 # sandbox
    - server script can register callbacks to part of object tree
@@ -19,7 +26,7 @@
      - request gets propagated to user
    - Program does needInit time setup through event script_init
    
-# instantiatedScripts
+# scripts
  - Scripts are stored using script code (persistent)
       - Script code is owned by user, but can be shared
  - Scripts are run as script instances (also persistent)
@@ -30,6 +37,7 @@
       - Scripts should listen to script_stop event
    
 # notes
+  - payload must be serializable (etc no callbacks allowed)
   - consider sending callbacks in events
   - use engine.on as often as possible, since its way more efficeint
   - make sure state object is never leaked through sandbox
