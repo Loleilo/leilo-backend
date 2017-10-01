@@ -23,5 +23,8 @@
     "auto-bind": "latest",
     "uuid": "latest",
     "circular-json": "latest"
+  },
+  "devDependencies": {
+    "colors": "latest"
   }
 }

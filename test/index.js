@@ -3,13 +3,18 @@ const funcOr = require("../app/util.js").funcOr;
 const waitAll = require("../app/util.js").funcAnd;
 const serverID = require("../app/config.js").serverID;
 const fs = require('fs');
+// const EventEmitter2 = require('eventemitter2');
 require('colors');
-
-const testscript = fs.readFileSync('./testscript.js').toString();
 require('../index');
+// const toArr = require("../app/pathed.js").toArr;
+
+const testScript = fs.readFileSync('./testScript.js').toString();
 const ws = new WebSocket('ws://localhost:80');
 const ws2 = new WebSocket('ws://localhost:80');
-const ws3=new WebSocket('ws://localhost:80');
+const ws3 = new WebSocket('ws://localhost:80');
+
+// const emt2 = new EventEmitter2();
+// const emt3 = new EventEmitter2();
 
 const s1 = (js) => {
     ws.send(JSON.stringify(js));
@@ -28,19 +33,22 @@ const scriptTest = () => {
             dst: serverID,
         },
         payload: {
-            scriptCode: testscript,
-            sandboxOptions: {
-            }
+            scriptCode: testScript,
+            sandboxOptions: {}
         }
     });
-    setTimeout(()=>{
+    setTimeout(() => {
         s3({
-            evt:{
+            evt: {
                 name: "request_accepted",
-                dst: serverID,
-            }
+                dst: '*',
+            },
+            payload: {
+                firstReqID: 'req1',
+                responseLst: ["accepted"],
+            },
         });
-    },1000);
+    }, 1000);
 };
 
 const openHandler = () => {
@@ -102,5 +110,13 @@ ws.on('open', wrapped[0]);
 ws2.on('open', wrapped[1]);
 ws3.on('open', wrapped[2]);
 
-ws3.on('message', (msg) => console.log(msg.green));
-ws2.on('message', (msg) => console.log(msg.blue));
+ws3.on('message', (msg) => {
+    console.log(msg.green);
+    // msg = JSON.parse(msg);
+    // emt2.emit(toArr(msg.evt), msg.payload);
+});
+ws2.on('message', (msg) => {
+    console.log(msg.blue);
+    // msg = JSON.parse(msg);
+    // emt3.emit(toArr(msg.evt), msg.payload);
+});

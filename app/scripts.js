@@ -67,26 +67,31 @@ module.exports = (on) => {
 
         //detect when user accepts
         engine.on(['request_accepted', info.parentID, scriptInstanceID], (payload) => {
-            if (!Array.isArray(payload))
-                payload = [payload];
+            let lst=payload.responseLst;
 
-            if (info.requestQueue[i].reqID !== payload.firstReqID) {
+            if (info.requestQueue[0].length===0) {
+                engine.emit(['error_occurred', serverID, info.parentID], {err: new Error('Empty request queue')});
+                return;
+            }
+
+            //concurrency safe check
+            if (info.requestQueue[0].reqID !== payload.firstReqID) {
                 engine.emit(['error_occurred', serverID, info.parentID], {err: new Error('First reqID mismatch')});
                 return;
             }
 
             //payload is list of accept/reject indicators
-            for (let i = 0; i < payload.length; i++) {
+            for (let i = 0; i < lst.length; i++) {
                 const reqID = info.requestQueue[i].reqID;
                 const req = info.requestQueue[i].request;
 
-                if (payload[i] === 'accept')
+                if (lst[i] === 'accept')
                     state.sandboxes[info.parentID].interface.emit(req.evt, req.payload);
 
                 //removed accepted request
                 info.requestQueue = info.requestQueue.slice(1);
                 //tell script that request has beeen accepted
-                engine.emit(['request_response', serverID, scriptInstanceID, config.pathMarker, reqID], payload[i]);
+                engine.emit(['request_response', serverID, scriptInstanceID, config.pathMarker, reqID], lst[i]);
             }
         });
 
