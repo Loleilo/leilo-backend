@@ -42,6 +42,7 @@ class Engine extends EventEmitter2 {
                     evt
                 )
             } catch (e) {
+                console.log(e);
                 this.emit(['error_occurred', serverID, evt.src], {
                     error: e,
                     srcEvent: evt

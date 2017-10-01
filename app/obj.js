@@ -22,7 +22,11 @@ module.exports = (on) => {
         //expose functions that will be required by other modules in state
         state.readPerms = eng.readPerms;
         state.read = eng.read;
+        state.readUserLevel = eng.readUserLevel;
+        //todo these should be called through events
         state.updateUserLevel = eng.updateUserLevel;
+        state.updatePerms = eng.updatePerms;
+        state.updatePerm = eng.updatePerm;
 
         next(state);
     });

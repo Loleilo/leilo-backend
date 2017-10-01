@@ -2,6 +2,7 @@ const PasswordHash = require('password-hash');
 const config = require('./config');
 const serverID = config.serverID;
 const d = require('./util').getDefault;
+const PERMS = config.permsModule.PERMS;
 
 module.exports.middleware = (on) => {
     on(['server_init', serverID, serverID], (state, next) => {
@@ -9,18 +10,25 @@ module.exports.middleware = (on) => {
         defaultUsers[serverID] = {
             passwordHash: PasswordHash.generate(config.serverDefaultPassword),
         };
-        state.users = d(state.users, defaultUsers);
+        state.passwordHashes = d(state.passwordHashes, defaultUsers);
+        state.users = d(state.users, {});
 
         next(state);
     });
 
     on(['create_user', serverID, serverID], (state, next, payload) => {
-        if (state.users[payload.username] !== undefined)
+        if (state.passwordHashes[payload.username] !== undefined)
             throw new Error('User already exists');
 
-        state.users[payload.username] = {
+        state.passwordHashes[payload.username] = {
             passwordHash: PasswordHash.generate(payload.password)
         };
+
+        //give user location
+        state.users[payload.username] = {};
+        state.updatePerms(serverID, state, ['users', payload.username], payload.username, {
+            lvl: PERMS.EDITOR,
+        });
 
         //give user level
         state.updateUserLevel(serverID, state, payload.username, 1);//todo replace 1 with constant
@@ -29,7 +37,7 @@ module.exports.middleware = (on) => {
     });
 
     on(['change_password', '*', serverID], (state, next, payload, engine, evt) => {
-        state.users[evt.src] = {
+        state.passwordHashes[evt.src] = {
             passwordHash: PasswordHash.generate(payload.password)
         };
 
@@ -38,7 +46,7 @@ module.exports.middleware = (on) => {
 
     on(['delete_user', '*', serverID], (state, next, payload, engine, evt) => {
         //todo make sure to disconnect user on delete, also to clean up user perms
-        state.users[evt.src] = null;
+        state.passwordHashes[evt.src] = null;
 
         next(state);
     });
@@ -46,8 +54,8 @@ module.exports.middleware = (on) => {
 
 module.exports.isValidLogin = (state, credentials) => {
     const username = credentials.username;
-    if (state.users[username])
-        if (PasswordHash.verify(credentials.password, state.users[username].passwordHash))
+    if (state.passwordHashes[username])
+        if (PasswordHash.verify(credentials.password, state.passwordHashes[username].passwordHash))
             return true;
     return false;
 };

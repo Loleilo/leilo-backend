@@ -21,6 +21,7 @@
     "vm2": "latest",
     "abind": "latest",
     "auto-bind": "latest",
-    "uuid": "latest"
+    "uuid": "latest",
+    "circular-json": "latest"
   }
 }

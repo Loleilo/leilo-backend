@@ -7,7 +7,7 @@ const wsConnector = require('./wsConnector');
 const user = require('./user');
 const debug = require('./debug');
 const persist = require('./persist');
-const scripts=require('./scripts');
+const scripts = require('./scripts');
 
 const serverID = config.serverID;
 
@@ -16,11 +16,12 @@ module.exports = () => {
 
     const engine = new Engine();
 
-    engine.use(persist);
+    if (config.persist)
+        engine.use(persist);
     engine.use(obj);
     engine.use(subscribe);
-    engine.use(scripts);
     engine.use(user.middleware);
+    engine.use(scripts);
     engine.use(wsConnector);
     engine.use(debug);
 

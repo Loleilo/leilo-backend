@@ -3,7 +3,6 @@ const pathed = require("./pathed.js");
 const a = Object.assign;
 
 const defaultOptions = {
-    scope: [],
     allowRemoveAllListeners: false,
     forceSrc: true,
     forceDst: true,
@@ -12,6 +11,12 @@ const defaultOptions = {
 class SandboxError extends Error {
 }
 module.exports.SandboxError = SandboxError;
+
+const _scopeDst = (evt)=> {
+    const type = pathed.evtType(evt);
+    if (type === 'invalid')throw new SandboxError("Invalid event");
+    return pathed.toArr(evt);
+};
 
 class Sandbox {
     constructor(engine, userID, options = {}) {
@@ -44,62 +49,41 @@ class Sandbox {
         };
     }
 
-
-    //these two functions convert between events inside scope, and events outside scope
-
-    _scopeSrc(evt) {
-        if (pathed.evtType(evt) === 'pathed')
-            evt.path = evt.path.slice(this.options.length);
-        return evt;
-    }
-
-    _scopeDst(evt) {
-        const type = pathed.evtType(evt);
-        if (type === 'invalid')throw new SandboxError("Invalid event");
-        if (type === 'pathed')
-            evt.path = this.options.scope.concat(evt.path);
-        return pathed.toArr(evt);
-    }
-
     //scoped emit and on functions
 
     _emit(evt, payload) {
         if (this.options.forceSrc) evt = a(evt, {
             src: this._userID // force src to be this user
         });
-        this._engine.emit(this._scopeDst(evt), payload);
+        this._engine.emit(_scopeDst(evt), payload);
     }
 
     _on(evt, callback) {
         if (this.options.forceDst) evt = a(evt, {
             dst: this._userID // force dst to be this user
         });
-        const wrapped = (payload, evtInner) => callback(payload, this._scopeSrc((evtInner)));
-        this._engine.on(this._scopeDst(evt), wrapped);
-        return wrapped; //for client to use if they want to remove
+        this._engine.on(_scopeDst(evt), callback);
     }
 
     _once(evt, callback) {
         if (this.options.forceDst) evt = a(evt, {
             dst: this._userID // force dst to be this user
         });
-        const wrapped = (payload, evtInner) => callback(payload, this._scopeSrc((evtInner)));
-        this._engine.once(this._scopeDst(evt), wrapped);
-        return wrapped; //for client to use if they want to remove
+        this._engine.once(_scopeDst(evt), callback);
     }
 
     _removeListener(evt, callback) {
         if (this.options.forceDst) evt = a(evt, {
             dst: this._userID // force dst to be this user
         });
-        this._engine.removeListener(this._scopeDst(evt), callback);
+        this._engine.removeListener(_scopeDst(evt), callback);
     }
 
     _removeAllListeners(evt) {
         if (this.options.forceDst) evt = a(evt, {
             dst: this._userID // force dst to be this user
         });
-        this._engine.removeAllListeners(this._scopeDst(evt));
+        this._engine.removeAllListeners(_scopeDst(evt));
     }
 }
 
