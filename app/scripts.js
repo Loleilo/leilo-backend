@@ -29,13 +29,13 @@ module.exports = (engine) => {
     });
 
 
-    engine.on(['createUser', '*', serverID], ( payload) => {
+    engine.on(['createUser', '*', serverID], (payload) => {
         engine.state.users[payload.username].scripts = {};
     });
 
     //runs a script instance
-    engine.on(['scriptStart', '*', serverID], ( payload, evt) => {
-        const state=engine.state;
+    engine.on(['scriptStart', '*', serverID], (payload, evt) => {
+        const state = engine.state;
         const scriptInstanceID = payload.scriptInstanceID;
         const scripts = state.users[evt.src].scripts;
         const info = scripts[scriptInstanceID];
@@ -61,7 +61,9 @@ module.exports = (engine) => {
             {
                 //timeout allowed for script
                 timeout: Math.min(config.maxScriptTimeout, d(info.scriptTimeout, config.maxScriptTimeout)),
-                sandbox: sandbox.interface //give actual sandbox
+                sandbox: Object.assign({
+                    scriptID: scriptInstanceID, //give script id
+                }, sandbox.interface), //give actual sandbox
             },
             config.globalVMOptions));
 
@@ -145,7 +147,7 @@ module.exports = (engine) => {
 
     //creates a script instance
     engine.on(['instantiateScript', '*', serverID], (payload, evt) => {
-        const state=engine.state;
+        const state = engine.state;
         //todo only user can create scripts for now
         if (state.readUserLevel(state, evt.src) > 1) //todo replace 1 with constant
             throw new PermissionError('Not enough permissions to instantiate script');

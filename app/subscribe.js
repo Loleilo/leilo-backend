@@ -26,6 +26,7 @@ module.exports = (engine) => {
                 break;
 
         //check permissions on prefix path
+        //todo doesn't need viewer perms for viewing update
         if (state.readPerms(state, evt.path.slice(0, firstIdx), evt.src).lvl < PERMS.VIEWER)
             throw new PermissionError('Not enough perms');
 
@@ -40,10 +41,9 @@ module.exports = (engine) => {
         for (let i = 0; i < evtNames.length; i++) {
             //listener remaps event to send to subscriber
             const listener = (payloadInner, evtInner) => {
-                //todo prevent duplicates (e.g. sending it to yourself)
-                engine.emit([evtInner.name, evtInner.src, evt.src, ...evtInner.path], payloadInner);
+                engine.emit([evtInner.name, evtInner.src, evt.src, config.pathMarker, ...evtInner.path], payloadInner);
             };
-            engine.on([evtNames[i], evtSrc, serverID, ...evt.path], listener);
+            engine.on([evtNames[i], evtSrc, serverID, config.pathMarker, ...evt.path], listener);
         }
 
         //init subscriber

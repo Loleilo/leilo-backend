@@ -8,7 +8,7 @@ on({
         src: 'leilo',
     }, (payload) => {
         emit({
-            name: 'gudcontent'+payload
+            name: 'gudcontent' + payload
         });
     });
     emit({
@@ -16,7 +16,7 @@ on({
         path: ['req1'],
         dst: 'leilo',
     }, {
-        evt:{
+        evt: {
             name: "do req 1",
         },
     });
@@ -26,7 +26,7 @@ on({
         src: 'leilo',
     }, (payload) => {
         emit({
-            name: 'gudcontent2'+payload
+            name: 'gudcontent2' + payload
         });
     });
     emit({
@@ -34,7 +34,7 @@ on({
         path: ['req2'],
         dst: 'leilo',
     }, {
-        evt:{
+        evt: {
             name: "do req 2",
         },
     });
@@ -44,7 +44,7 @@ on({
         src: 'leilo',
     }, (payload) => {
         emit({
-            name: 'gudcontent3'+payload
+            name: 'gudcontent3' + payload
         });
     });
     emit({
@@ -52,30 +52,62 @@ on({
         path: ['req3'],
         dst: 'leilo',
     }, {
-        evt:{
+        evt: {
             name: "do req 3",
         },
-    });
-    once({
-        name: 'requestResponse',
-        path: ['req4'],
-        src: 'leilo',
-    }, (payload) => {
-        emit({
-            name: 'gudcontent4'+payload
-        });
-        emit({
-            name: 'initDone'
-        });
     });
     emit({
         name: 'requestElevated',
         path: ['req4'],
         dst: 'leilo',
     }, {
-        evt:{
-            name: "do req 4",
+        evt: {
+            name: "create",
+            path: ['users', 'sunny'],
+            dst: 'leilo',
         },
+        payload: {
+            newObjName: 'stuff',
+            newObjVal: 10,
+        }
+    });
+    once({
+        name: 'requestResponse',
+        path: ['req5'],
+        src: 'leilo',
+    }, () => {
+        emit({
+            name: 'requests done'
+        });
+        on({
+            name: 'update',
+            path: ['users', 'sunny', 'stuff'],
+            src: "*"
+        }, (payload) => {
+            emit({
+                name: "update detected val=" + payload.value
+            });
+        });
+        emit({
+            name: 'subscribe',
+            dst: 'leilo',
+            path: ['users', 'sunny', 'stuff']
+        });
+    });
+    emit({
+        name: 'requestElevated',
+        path: ['req5'],
+        dst: 'leilo',
+    }, {
+        evt: {
+            name: "updatePerms",
+            path: ['users', 'sunny', 'stuff'],
+            dst: 'leilo',
+        },
+        payload: {
+            user: scriptID,
+            perms: {lvl: 3}
+        }
     });
 });
 emit({

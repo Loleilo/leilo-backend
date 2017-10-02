@@ -20,9 +20,11 @@ const s1 = (js) => {
     ws.send(JSON.stringify(js));
 };
 const s2 = (js) => {
+    console.log(('< ' + JSON.stringify(js)).underline.blue);
     ws2.send(JSON.stringify(js));
 };
 const s3 = (js) => {
+    console.log(('< ' + JSON.stringify(js)).underline.green);
     ws3.send(JSON.stringify(js));
 };
 
@@ -48,7 +50,31 @@ const scriptTest = () => {
                 responseLst: ["accept", "reject", "skip"],
             },
         });
-    }, 500);
+    }, 100);
+    setTimeout(() => {
+        s3({
+            evt: {
+                name: "requestAccepted",
+                dst: '*',
+            },
+            payload: {
+                firstReqID: 'req4',
+                responseLst: ["accept", 'accept'],
+            },
+        });
+    }, 200);
+    setTimeout(() => {
+        s3({
+            evt: {
+                name: "update",
+                dst: 'leilo',
+                path: ['users', 'sunny', 'stuff'],
+            },
+            payload: {
+                value: 209875943
+            },
+        });
+    }, 300);
 };
 
 const openHandler = () => {
@@ -111,12 +137,12 @@ ws2.on('open', wrapped[1]);
 ws3.on('open', wrapped[2]);
 
 ws3.on('message', (msg) => {
-    console.log(msg.green);
+    console.log(('> ' + msg).green);
     // msg = JSON.parse(msg);
     // emt2.emit(toArr(msg.evt), msg.payload);
 });
 ws2.on('message', (msg) => {
-    console.log(msg.blue);
+    console.log(('> ' + msg).blue);
     // msg = JSON.parse(msg);
     // emt3.emit(toArr(msg.evt), msg.payload);
 });

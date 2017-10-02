@@ -3,6 +3,8 @@ const config = require('./config');
 const isValidLogin = require("./user.js").isValidLogin;
 const serverID = config.serverID;
 const Sandbox = require('./sandbox').Sandbox;
+const JSON=require('circular-json');
+require('colors');
 
 let globalConnectionID = 0;
 
@@ -73,13 +75,14 @@ module.exports = (engine) => {
                             clientSandbox.interface.emit(msg.evt, msg.payload);
                         } catch (err) {
                             engine.emit(['errorOccurred', currClientID, currClientID], {
-                                err: new Error("Couldn't parse JSON")
+                                err: err.toString()
                             });
                         }
                     }, currConnectionID);
 
                     //handles when server sends messages to client
                     const serverEvtHandler = (payload, evt) => {
+                        //todo if (evt.src === currClientID)return; //prevents getting self messages
                         const msg = JSON.stringify({
                             evt: evt,
                             payload: payload,
