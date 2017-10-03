@@ -4,10 +4,10 @@ const JSON = require('circular-json');
 require('colors');
 module.exports = (engine) => {
     engine.onM(['*', '*', '*', '**'], (state, next, payload, evt) => {
-        const color = evt.name === 'errorOccurred' ? 'red' : 'yellow';
         if (debugLevel === 'none')
             return;
-        else if (debugLevel === 'short') {
+        const color = evt.name === 'errorOccurred' ? 'red' : 'yellow';
+        if (debugLevel === 'short') {
             console.log(("Event occurred:" + evt.name
                 + '\n' + ' direction: ' + evt.src + '->' + evt.dst
                 + '\n' + ' path: ' + evt.path)[color]

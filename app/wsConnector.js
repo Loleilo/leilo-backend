@@ -70,9 +70,9 @@ module.exports = (engine) => {
                         clientSandbox = new Sandbox(engine, currClientID);
                         state.sandboxes[currClientID] = clientSandbox;
                         //cleanup
-                        engine.emitNext(['gc', serverID, serverID, config.pathMarker, 'sandboxes', currClientID], {
-                            evt: ['serverExit', serverID, serverID]
-                        });
+                        engine.emitNext(['gc', serverID, serverID, config.pathMarker, 'sandboxes', currClientID],
+                            [['serverExit', serverID, serverID],
+                                ['userDeleted', serverID, currClientID],]);
                     } else clientSandbox = state.sandboxes[currClientID];
 
                     //pipe client messages to server

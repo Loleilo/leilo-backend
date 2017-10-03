@@ -32,6 +32,7 @@ module.exports = (engine) => {
 
     engine.on(['create', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
         eng.create(evt.src, engine.state, evt.path, payload.newObjName, payload.newObjVal);
+        engine.emitNext(['gc', evt.src, serverID], ['userDeleted', serverID, evt.src]);
     });
 
     engine.on(['update', '*', serverID, config.pathMarker, '**'], (payload, evt) => {

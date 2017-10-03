@@ -52,24 +52,28 @@ class Engine extends EventEmitter2 {
 
     //registers a callback into the middleware chain
     onM(evt, callback) {
+        this._checkInvalid(evt);
         this.pendingEmitter.on(evt, this._createHandler(callback))
     };
 
     onceM(evt, callback) {
+        this._checkInvalid(evt);
         this.pendingEmitter.once(evt, this._createHandler(callback))
     }
 
-    emit(evt, payload) {
-        //ignore internal events
-        if (evt === 'newListener' || evt==='removeListener')return;
-
-        if (!Array.isArray(evt) || evtType(evt) === 'invalid') {
+    _checkInvalid(evt) {
+        if (evtType(evt) === 'invalid') {
             this.emit(['errorOccurred', serverID, serverID], {
                 err: new Error('Invalid event'),
                 srcEvt: evt,
             });
-            return;
         }
+    }
+
+    emit(evt, payload) {
+        //ignore internal events
+        if (evt === 'newListener' || evt === 'removeListener')return;
+        this._checkInvalid(evt);
 
         const defaultParams = [undefined, '*', '*'];
         for (let i = 0; i < defaultParams.length; i++)
