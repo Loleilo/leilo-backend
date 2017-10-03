@@ -2,7 +2,8 @@ const PasswordHash = require('password-hash');
 const config = require('./config');
 const serverID = config.serverID;
 const d = require('./util').getDefault;
-const PERMS = config.permsModule.PERMS;
+const PERMS = config.permsEngineOptions.permsModule.PERMS;
+const USER_LEVEL=config.permsEngineOptions.USER_LEVEL;
 
 module.exports.middleware = (engine) => {
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
@@ -34,7 +35,7 @@ module.exports.middleware = (engine) => {
         });
 
         //give user level
-        state.updateUserLevel(serverID, state, payload.username, 1);//todo replace 1 with constant
+        state.updateUserLevel(serverID, state, payload.username, USER_LEVEL.USER);
     });
 
     engine.on(['changePassword', '*', serverID], (payload, evt) => {

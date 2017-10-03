@@ -64,7 +64,7 @@ class Sandbox {
     //scoped emit and on functions todo idk why this is needed (causes error if not used)
 
     _emit(evt, payload) {
-        this._engine.emit(evt, payload);
+        this._engine.emitNext(evt, payload);
     }
 
     _on(evt, callback) {

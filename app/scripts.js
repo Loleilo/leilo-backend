@@ -6,7 +6,8 @@ const {VM} = require('vm2');
 const uuid4 = require('uuid/v4');
 const toArr = require("./pathed.js").toArr;
 const PermissionError = require("obj-perms-engine").PermissionError;
-const PERMS = config.permsModule.PERMS;
+const PERMS = config.permsEngineOptions.permsModule.PERMS;
+const USER_LEVEL=config.permsEngineOptions.USER_LEVEL;
 
 module.exports = (engine) => {
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
@@ -91,8 +92,15 @@ module.exports = (engine) => {
                 let ans = lst[0];
 
                 //remove from lists
+                engine.emit(toArr({
+                    name: 'update',
+                    src: serverID,
+                    dst: serverID,
+                    path: ['users', info.parentID, 'scripts', scriptInstanceID, 'requestQueue']
+                }), {
+                    value: info.requestQueue.slice(1)
+                });
                 lst = lst.slice(1);
-                info.requestQueue = info.requestQueue.slice(1);
 
                 if (ans === 'accept')
                     state.sandboxes[info.parentID].interface.emit(req.evt, req.payload);
@@ -102,7 +110,7 @@ module.exports = (engine) => {
                     ans = 'accept';
 
                 //tell script that request has beeen accepted
-                engine.emit(['requestResponse', serverID, scriptInstanceID, config.pathMarker, reqID], ans);
+                engine.emitNext(['requestResponse', serverID, scriptInstanceID, config.pathMarker, reqID], ans);
             }
         });
 
@@ -149,14 +157,14 @@ module.exports = (engine) => {
     engine.on(['instantiateScript', '*', serverID], (payload, evt) => {
         const state = engine.state;
         //todo only user can create scripts for now
-        if (state.readUserLevel(state, evt.src) > 1) //todo replace 1 with constant
+        if (state.readUserLevel(state, evt.src) > USER_LEVEL.USER)
             throw new PermissionError('Not enough permissions to instantiate script');
 
         const scriptInstanceID = uuid4();//give script new id
         const scripts = state.users[evt.src].scripts;
 
         //give script a user level
-        state.updateUserLevel(serverID, state, scriptInstanceID, 2);//todo replace 2 with constants
+        state.updateUserLevel(serverID, state, scriptInstanceID, USER_LEVEL.PRGM);
 
         //store script info
         scripts[scriptInstanceID] = Object.assign(payload, {

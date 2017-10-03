@@ -4,11 +4,9 @@ const version = require('../package.json').version;
 module.exports = {
     serverID: "leilo", //username of server
     serverDefaultPassword: "pass", //default password given to server
-    permsModule: perms, //permission module to use in obj system
     version: version, //gives program easy access to current package version
     saveLocation: `${__dirname}\\data\\state.json`, //where server state is stored on shutdown etc.
     saveInterval: -1,//amount of millis between autosave, -1 means don't autosave
-    permsWildcard: '*', //wildcard indicator for perms/obj system
     pathMarker: 'path',//indicator of path in event array
     maxScriptTimeout: 1000, //maximum time a script instance can run synchronously for
 
@@ -28,4 +26,14 @@ module.exports = {
     persist: false, //whether to save server changes
 
     debugLevel: "normal", // can be none, short, normal, or verbose
+
+    permsEngineOptions:{
+        USER_LEVEL: {
+            ROOT: 0,
+            USER: 1,
+            PRGM: 2,
+        },
+        WILDCARD: '*',
+        permsModule: perms,
+    },
 };

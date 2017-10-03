@@ -4,20 +4,12 @@ const serverID = config.serverID;
 
 const ObjPermsEngine = obj_perms_engine.ObjPermsEngine;
 
-const eng = new ObjPermsEngine({
-    USER_LEVEL: {
-        ROOT: 0,
-        USER: 1,
-        PRGM: 2,
-    },
-    WILDCARD: config.permsWildcard,
-    permsModule: config.permsModule,
-});
+const eng = new ObjPermsEngine(config.permsEngineOptions);
 
 module.exports = (engine) => {
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
         //give server root perms
-        eng.u_updateUserLevel(serverID, state, eng.config.USER_LEVEL.ROOT);
+        eng.u_updateUserLevel(serverID, state, config.permsEngineOptions.USER_LEVEL.ROOT);
 
         //expose functions that will be required by other modules in state
         state.readPerms = eng.readPerms;

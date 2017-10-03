@@ -3,10 +3,8 @@ const funcOr = require("../app/util.js").funcOr;
 const waitAll = require("../app/util.js").funcAnd;
 const serverID = require("../app/config.js").serverID;
 const fs = require('fs');
-// const EventEmitter2 = require('eventemitter2');
 require('colors');
 require('../index');
-// const toArr = require("../app/pathed.js").toArr;
 
 const testScript = fs.readFileSync('./testScript.js').toString();
 const ws = new WebSocket('ws://127.0.0.1:80');

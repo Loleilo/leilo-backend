@@ -2,15 +2,6 @@ on({
     name: 'initRun',
     src: '*'
 }, () => {
-    once({
-        name: 'requestResponse',
-        path: ['req1'],
-        src: 'leilo',
-    }, (payload) => {
-        emit({
-            name: 'gudcontent' + payload
-        });
-    });
     emit({
         name: 'requestElevated',
         path: ['req1'],
@@ -22,13 +13,14 @@ on({
     });
     once({
         name: 'requestResponse',
-        path: ['req2'],
+        path: ['req1'],
         src: 'leilo',
     }, (payload) => {
         emit({
-            name: 'gudcontent2' + payload
+            name: 'gudcontent' + payload
         });
     });
+
     emit({
         name: 'requestElevated',
         path: ['req2'],
@@ -40,13 +32,14 @@ on({
     });
     once({
         name: 'requestResponse',
-        path: ['req3'],
+        path: ['req2'],
         src: 'leilo',
     }, (payload) => {
         emit({
-            name: 'gudcontent3' + payload
+            name: 'gudcontent2' + payload
         });
     });
+
     emit({
         name: 'requestElevated',
         path: ['req3'],
@@ -56,6 +49,16 @@ on({
             name: "do req 3",
         },
     });
+    once({
+        name: 'requestResponse',
+        path: ['req3'],
+        src: 'leilo',
+    }, (payload) => {
+        emit({
+            name: 'gudcontent3' + payload
+        });
+    });
+
     emit({
         name: 'requestElevated',
         path: ['req4'],
@@ -71,29 +74,7 @@ on({
             newObjVal: 10,
         }
     });
-    once({
-        name: 'requestResponse',
-        path: ['req5'],
-        src: 'leilo',
-    }, () => {
-        emit({
-            name: 'requests done'
-        });
-        on({
-            name: 'update',
-            path: ['users', 'sunny', 'stuff'],
-            src: "*"
-        }, (payload) => {
-            emit({
-                name: "update detected val=" + payload.value
-            });
-        });
-        emit({
-            name: 'subscribe',
-            dst: 'leilo',
-            path: ['users', 'sunny', 'stuff']
-        });
-    });
+
     emit({
         name: 'requestElevated',
         path: ['req5'],
@@ -109,7 +90,30 @@ on({
             perms: {lvl: 3}
         }
     });
+    once({
+        name: 'requestResponse',
+        path: ['req5'],
+        src: 'leilo',
+    }, () => {
+        emit({
+            name: 'requests done'
+        });
+        emit({
+            name: 'subscribe',
+            dst: 'leilo',
+            path: ['users', 'sunny', 'stuff']
+        });
+        on({
+            name: 'update',
+            path: ['users', 'sunny', 'stuff'],
+            src: "*"
+        }, (payload) => {
+            emit({
+                name: "update detected val=" + payload.value
+            });
+        });
+    });
 });
 emit({
-    name: 'yay1'
+    name: 'script stated running'+scriptID
 });

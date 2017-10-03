@@ -1,17 +1,17 @@
 # todo
  - check what causes errors not to be shown
- 1. subscribe reset 
- 1. use emit async to make sure evts run in order
  1. make 'tmp' objects, which server doesn't save
+ 1. autocleanup
  1. add whitelist thing to sandbox
  1. evttables
- 1. autocleanup
- 1. organize state tree
- 1. make obj events universal (aka no converting except in engine)
+ 1. make state modifiers inside state not have to have state as param
+ 1. organize state tree <- probably will never do
  2. add semantic version to file
  4. security
- 3. Parameter checking system
- 1. Create api map (documentation)
+      - Parameter checking system
+ 1. Create documentation
+ 1. optimize ws usage/ number of events that are sent
+ 1. make obj events universal (aka no converting except in engine) <-- cancer
  1. think about sandboxing server code
  
 # sandbox

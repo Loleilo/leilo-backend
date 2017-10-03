@@ -5,7 +5,7 @@ const config = require('./config');
 const PermissionError = require('obj-perms-engine').PermissionError;
 const serverID = require('./config').serverID;
 
-const PERMS = config.permsModule.PERMS;
+const PERMS = config.permsEngineOptions.permsModule.PERMS;
 
 //payload may contain an array in evt as the list of operations to redirect
 const defaultPayload = {
