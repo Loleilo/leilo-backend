@@ -24,6 +24,7 @@ class Engine extends EventEmitter2 {
 
         // const actualSuper = super;
         //handles events for middleware (aka before actual event is run)
+        //todo super is not bound properly
         this.pendingEmitter = new EventEmitterChain2(defaultConf, (...args) => super.emit(...args));
     }
 

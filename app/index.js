@@ -8,6 +8,7 @@ const user = require('./user');
 const debug = require('./debug');
 const persist = require('./persist');
 const scripts = require('./scripts');
+const gc = require('./gc');
 
 const serverID = config.serverID;
 
@@ -24,6 +25,7 @@ module.exports = () => {
     scripts(engine);
     wsConnector(engine);
     debug(engine);
+    gc(engine);
 
     engine.once(['serverExit', serverID, serverID], () => process.exit());
     process.once('exit', () => engine.emit(['serverExit', serverID, '*']));

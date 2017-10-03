@@ -3,7 +3,7 @@ const config = require('./config');
 const isValidLogin = require("./user.js").isValidLogin;
 const serverID = config.serverID;
 const Sandbox = require('./sandbox').Sandbox;
-const JSON=require('circular-json');
+const JSON = require('circular-json');
 require('colors');
 
 let globalConnectionID = 0;
@@ -65,8 +65,15 @@ module.exports = (engine) => {
                     console.log(`User @${currClientID} authenticated`);
 
                     //create sandbox for client
-                    const clientSandbox = new Sandbox(engine, currClientID);
-                    state.sandboxes[currClientID] = clientSandbox;
+                    let clientSandbox;
+                    if (state.sandboxes[currClientID] === undefined) {
+                        clientSandbox = new Sandbox(engine, currClientID);
+                        state.sandboxes[currClientID] = clientSandbox;
+                        //cleanup
+                        engine.emitNext(['gc', serverID, serverID, config.pathMarker, 'sandboxes', currClientID], {
+                            evt: ['serverExit', serverID, serverID]
+                        });
+                    } else clientSandbox = state.sandboxes[currClientID];
 
                     //pipe client messages to server
                     autoDisconnectAddListener(ws, 'message', (message) => {

@@ -6,7 +6,7 @@ module.exports = (engine) => {
     engine.onM(['*', '*', '*', '**'], (state, next, payload, evt) => {
         const color = evt.name === 'errorOccurred' ? 'red' : 'yellow';
         if (debugLevel === 'none')
-           return;
+            return;
         else if (debugLevel === 'short') {
             console.log(("Event occurred:" + evt.name
                 + '\n' + ' direction: ' + evt.src + '->' + evt.dst
@@ -27,7 +27,7 @@ module.exports = (engine) => {
             );
         }
         if (color === 'red')
-            console.log(payload.err.toString().red);
+            console.log((payload.err.message + " Stack trace:\n" + payload.err.stack).red);
         next(state);
     });
 };

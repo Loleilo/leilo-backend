@@ -6,11 +6,10 @@ const USER_LEVEL = config.permsEngineOptions.USER_LEVEL;
 module.exports = (engine) => {
     engine.on(['gc', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
         const state = engine.state;
-
-        let on = engine.on;
+        const args=[payload.evt, () => engine.emit(['del', evt.src, serverID, config.pathMarker, ...evt.path])];
         if (state.readUserLevel(state, evt.src) >= USER_LEVEL.USER)
-            on = engine.state.sandboxes[evt.src].interface.on;
-
-        on(payload.evt, () => engine.emit(['del', evt.src, serverID, config.pathMarker, ...evt.path]));
+            engine.state.sandboxes[evt.src].interface.on(...args);
+        else
+            engine.on(...args);
     });
 };
