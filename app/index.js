@@ -29,7 +29,7 @@ module.exports = () => {
     debug(engine);
     gc(engine);
 
-    engine.once(['serverExit', serverID, serverID], () => process.exit());
+    // todo engine.once(['serverExit', serverID, serverID], () => process.exit());
     process.once('exit', () => engine.emit(['serverExit', serverID, '*']));
     process.once('SIGINT', () => engine.emit(['serverExit', serverID, '*']));
     process.once('SIGUSR1', () => engine.emit(['serverExit', serverID, '*']));

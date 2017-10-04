@@ -24,7 +24,7 @@ module.exports = {
     //default value for max. number of listeners in event engine
     engineMaxListeners: 30,
 
-    persist: false, //whether to save server changes
+    persist: true, //whether to save server changes
 
     debugLevel: "normal", // can be none, short, normal, or verbose
 

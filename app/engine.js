@@ -42,6 +42,7 @@ class Engine extends EventEmitter2 {
                     evt
                 )
             } catch (err) {
+                console.log(err, err.stack);
                 this.emit(['error', serverID, evt.src], {
                     err: err,
                     srcEvent: evt

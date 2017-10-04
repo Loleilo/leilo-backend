@@ -11,7 +11,7 @@ module.exports = (engine) => {
                 try {
                     obj = JSON.parse(obj);
                 } catch (err) {
-                    engine.emitNext(['error_occurred', serverID, serverID], {err:err, srcEvt: evt});
+                    engine.emitNext(['warning', serverID, serverID], {err: err, srcEvt: evt});
                     obj = undefined;
                 }
                 if (!obj) obj = {version: config.version};
