@@ -24,7 +24,7 @@ module.exports = {
     //default value for max. number of listeners in event engine
     engineMaxListeners: 30,
 
-    persist: true, //whether to save server changes
+    persist: true, //whether to save server changes (make sure to set to false on debug)
 
     debugLevel: "normal", // can be none, short, normal, or verbose
 
@@ -39,10 +39,16 @@ module.exports = {
     },
 
     defaultEvtRules: [
+        { //accept all root events
+            action: 'accept',
+            match: match.userLevel(match.ALL, 0)
+        },
         //accept all non handled events
         {
             action: 'accept',
             match: match.ALL,
         },
-    ]
+    ],
+
+    exitDelay: 200, //amount to wait before exiting
 };

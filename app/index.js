@@ -9,7 +9,8 @@ const debug = require('./debug');
 const persist = require('./persist');
 const scripts = require('./scripts');
 const gc = require('./gc');
-const evtTables=require('./evtTables');
+const evtTables = require('./evtTables');
+const funcOr = require("./util.js").funcOr;
 
 const serverID = config.serverID;
 
@@ -29,11 +30,12 @@ module.exports = () => {
     debug(engine);
     gc(engine);
 
-    // todo engine.once(['serverExit', serverID, serverID], () => process.exit());
-    process.once('exit', () => engine.emit(['serverExit', serverID, '*']));
-    process.once('SIGINT', () => engine.emit(['serverExit', serverID, '*']));
-    process.once('SIGUSR1', () => engine.emit(['serverExit', serverID, '*']));
-    process.once('SIGUSR2', () => engine.emit(['serverExit', serverID, '*']));
+    engine.once(['serverExit', serverID, serverID], () => setImmediate(process.exit));
+    const h=funcOr(() => engine.emit(['serverExit', serverID, '*']), 5, true);
+    process.once('exit', h[0]);
+    process.once('SIGINT', h[1]);
+    process.once('SIGUSR1', h[2]);
+    process.once('SIGUSR2', h[3]);
     // process.once('uncaughtException', () => engine.emit(['server_exit', serverID, '*']));
 
     engine.emit(["serverInit", serverID, serverID]);
