@@ -101,6 +101,7 @@ on({
         emit({
             name: 'subscribe',
             dst: 'leilo',
+        },{
             path: ['users', 'sunny', 'stuff']
         });
         on({

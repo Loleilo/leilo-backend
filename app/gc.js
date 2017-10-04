@@ -13,7 +13,7 @@ module.exports = (engine) => {
             payload = [payload];
 
         for (let i = 0; i < payload.length; i++) {
-            const callback = () => engine.emit(['del', evt.src, serverID, config.pathMarker, ...evt.path]);
+            const callback = () => engine.emit(['delete', evt.src, serverID, config.pathMarker, ...evt.path]);
             if (state.readUserLevel(state, evt.src) >= USER_LEVEL.USER)
                 engine.state.sandboxes[evt.src].interface.on(toObj(payload[i]), callback);
             else
