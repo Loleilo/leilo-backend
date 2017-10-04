@@ -8,7 +8,7 @@ module.exports.funcAnd = (callback, n) => {
             arr[i] = true;
             for (let j = 0; j < n; j++)
                 if (!arr[j])return;
-            callback();
+            callback(...args);
         };
     }
     return res;

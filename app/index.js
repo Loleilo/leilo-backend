@@ -30,7 +30,7 @@ module.exports = () => {
     debug(engine);
     gc(engine);
 
-    engine.once(['serverExit', serverID, serverID], () => setImmediate(process.exit));
+    engine.once(['serverExit', serverID, serverID], () => setTimeout(process.exit, config.exitDelay));
     const h=funcOr(() => engine.emit(['serverExit', serverID, '*']), 5, true);
     process.once('exit', h[0]);
     process.once('SIGINT', h[1]);
