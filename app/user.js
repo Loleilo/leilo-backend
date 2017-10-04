@@ -7,13 +7,8 @@ const USER_LEVEL=config.permsEngineOptions.USER_LEVEL;
 
 module.exports.middleware = (engine) => {
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
-        const defaultUsers = {};
-        defaultUsers[serverID] = {
-            passwordHash: PasswordHash.generate(config.serverDefaultPassword),
-        };
-        state.passwordHashes = d(state.passwordHashes, defaultUsers);
+        state.passwordHashes = d(state.passwordHashes, config.defaultPasswordHashes);
         state.users = d(state.users, {});
-
         next(state);
     });
 

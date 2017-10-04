@@ -8,7 +8,7 @@ const eng = new ObjPermsEngine(config.permsEngineOptions);
 
 module.exports = (engine) => {
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
-        //give server root perms
+        //give server root perms todo make this less hardcode
         eng.u_updateUserLevel(serverID, state, config.permsEngineOptions.USER_LEVEL.ROOT);
 
         //expose functions that will be required by other modules in state

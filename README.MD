@@ -102,12 +102,9 @@ deleteUser - deletes sending user
 # stuff for me
 
 ## todo
- - check what causes errors not to be shown
- 1. make serverDefaultPassword more secure
- 1. disconnect client on server shutdown
+ - check what causes errors not to be shown, also error infinite loop
  1. make scripts named instead of uuid
  1. replace sandbox with evttables
- 1. organize state tree <- probably will never do
  2. add semantic version to file
  4. security
       - Parameter checking system

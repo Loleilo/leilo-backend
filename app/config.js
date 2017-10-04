@@ -4,7 +4,16 @@ const match = require('./evtTablesMatch');
 
 module.exports = {
     serverID: "leilo", //username of server
-    serverDefaultPassword: "pass", //default password given to server
+
+    defaultPasswordHashes:{
+        leilo: {
+            passwordHash: "sha1$37dea33b$1$0ca2d75849f2731a8248054702a5f4e7d00abc22"
+        },
+        root: {
+            passwordHash: "sha1$d403571a$1$3c5e41c8ce249b80d526ee9823dc4abc83509858"
+        },
+    },
+
     version: version, //gives program easy access to current package version
     saveLocation: `${__dirname}\\data\\state.json`, //where server state is stored on shutdown etc.
     saveInterval: -1,//amount of millis between autosave, -1 means don't autosave
