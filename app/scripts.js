@@ -43,7 +43,7 @@ module.exports = (engine) => {
 
         //prevent script from running twice
         if (info.running) {
-            engine.emit(['errorOccurred', serverID, evt.src], {
+            engine.emit(['error', serverID, evt.src], {
                 err: new Error('Script instance is already running')
             });
             return;
@@ -73,13 +73,13 @@ module.exports = (engine) => {
             let lst = payload.responseLst;
 
             if (info.requestQueue.length < lst.length) {
-                engine.emit(['errorOccurred', serverID, info.parentID], {err: new Error('More answers than requests')});
+                engine.emit(['error', serverID, info.parentID], {err: new Error('More answers than requests')});
                 return;
             }
 
             //concurrency safe check
             if (info.requestQueue[0].reqID !== payload.firstReqID) {
-                engine.emit(['errorOccurred', serverID, info.parentID], {err: new Error('First reqID mismatch')});
+                engine.emit(['error', serverID, info.parentID], {err: new Error('First reqID mismatch')});
                 return;
             }
 

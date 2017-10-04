@@ -42,7 +42,7 @@ class Engine extends EventEmitter2 {
                     evt
                 )
             } catch (err) {
-                this.emit(['errorOccurred', serverID, evt.src], {
+                this.emit(['error', serverID, evt.src], {
                     err: err,
                     srcEvent: evt
                 });
@@ -63,7 +63,7 @@ class Engine extends EventEmitter2 {
 
     _checkInvalid(evt) {
         if (evtType(evt) === 'invalid') {
-            this.emit(['errorOccurred', serverID, serverID], {
+            this.emit(['error', serverID, serverID], {
                 err: new Error('Invalid event'),
                 srcEvt: evt,
             });

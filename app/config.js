@@ -1,5 +1,6 @@
 const perms = require('obj-perms-engine').NVEOPerms;
 const version = require('../package.json').version;
+const match = require('./evtTablesMatch');
 
 module.exports = {
     serverID: "leilo", //username of server
@@ -27,7 +28,7 @@ module.exports = {
 
     debugLevel: "normal", // can be none, short, normal, or verbose
 
-    permsEngineOptions:{
+    permsEngineOptions: {
         USER_LEVEL: {
             ROOT: 0,
             USER: 1,
@@ -36,4 +37,12 @@ module.exports = {
         WILDCARD: '*',
         permsModule: perms,
     },
+
+    defaultEvtRules: [
+        //accept all non handled events
+        {
+            action: 'accept',
+            match: match.ALL,
+        },
+    ]
 };

@@ -9,6 +9,7 @@ const debug = require('./debug');
 const persist = require('./persist');
 const scripts = require('./scripts');
 const gc = require('./gc');
+const evtTables=require('./evtTables');
 
 const serverID = config.serverID;
 
@@ -19,6 +20,7 @@ module.exports = () => {
 
     if (config.persist)
         persist(engine);
+    evtTables.evtTable(engine);
     obj(engine);
     subscribe(engine);
     user.middleware(engine);

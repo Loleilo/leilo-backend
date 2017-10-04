@@ -1,12 +1,13 @@
 const debugLevel = require('./config').debugLevel;
 const JSON = require('circular-json');
+const pathMarker = require("./config.js").pathMarker;
 //handles a client websocket connection
 require('colors');
 module.exports = (engine) => {
-    engine.onM(['*', '*', '*', '**'], (state, next, payload, evt) => {
+    const debugHandler=(state, next, payload, evt) => {
         if (debugLevel === 'none')
             return;
-        const color = evt.name === 'errorOccurred' ? 'red' : 'yellow';
+        const color = evt.name === 'error' ? 'red' : 'yellow';
         if (debugLevel === 'short') {
             console.log(("Event occurred:" + evt.name
                 + '\n' + ' direction: ' + evt.src + '->' + evt.dst
@@ -29,5 +30,7 @@ module.exports = (engine) => {
         if (color === 'red')
             console.log((payload.err.message + " Stack trace:\n" + payload.err.stack).red);
         next(state);
-    });
+    };
+    engine.onM(['*', '*', '*'], debugHandler);
+    engine.onM(['*', '*', '*', pathMarker, '**'], debugHandler);
 };

@@ -52,7 +52,7 @@ module.exports = (engine) => {
                 try {
                     msg = JSON.parse(data);
                 } catch (err) {
-                    engine.emit(['errorOccurred', currConnectionID, serverID], {
+                    engine.emit(['error', currConnectionID, serverID], {
                         err: new Error("Couldn't parse JSON")
                     });
                 }
@@ -81,7 +81,7 @@ module.exports = (engine) => {
                             const msg = JSON.parse(message);
                             clientSandbox.interface.emit(msg.evt, msg.payload);
                         } catch (err) {
-                            engine.emit(['errorOccurred', currClientID, currClientID], {
+                            engine.emit(['error', currClientID, currClientID], {
                                 err: err.toString()
                             });
                         }
