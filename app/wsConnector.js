@@ -5,6 +5,7 @@ const serverID = config.serverID;
 const Sandbox = require('./sandbox').Sandbox;
 const JSON = require('circular-json');
 require('colors');
+const toArr = require("./pathed.js").toArr;
 
 let globalConnectionID = 0;
 
@@ -70,10 +71,17 @@ module.exports = (engine) => {
                     } else clientSandbox = state.sandboxes[currClientID];
 
                     //pipe client messages to server
-                    autoDisconnectAddListener(ws, 'message', (message) => {
+                    autoDisconnectAddListener(ws, 'message', (message, callback) => {
                         try {
                             const msg = JSON.parse(message);
                             clientSandbox.interface.emit(msg.evt, msg.payload);
+
+                            //ack callback
+                            if (callback)
+                                engine.onM(toArr(msg.evt), (state, next) => {
+                                    next(state);
+                                    callback();
+                                });
                         } catch (err) {
                             engine.emit(['error', currClientID, currClientID], {
                                 err: err.toString()

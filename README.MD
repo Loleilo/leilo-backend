@@ -107,6 +107,7 @@ deleteUser - deletes sending user
  1. make scripts named instead of uuid
  1. replace sandbox with evttables
  2. add semantic version to file
+ 1. consider using promises
  4. security
       - Parameter checking system
  1. Create documentation
