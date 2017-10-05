@@ -18,10 +18,10 @@
     "password-hash": "latest",
     "socket.io": "^2.0.3",
     "vm2": "latest",
-    "ws": "latest",
-    "socket.io-client": "latest"
+    "ws": "latest"
   },
   "devDependencies": {
-    "colors": "latest"
+    "colors": "latest",
+    "socket.io-client": "latest"
   }
 }

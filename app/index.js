@@ -26,9 +26,9 @@ module.exports = () => {
     subscribe(engine);
     user.middleware(engine);
     scripts(engine);
-    wsConnector(engine);
-    debug(engine);
     gc(engine);
+    debug(engine);
+    wsConnector(engine);
 
     engine.once(['serverExit', serverID, serverID], () => setTimeout(process.exit, config.exitDelay));
     const h=funcOr(() => engine.emit(['serverExit', serverID, '*']), 5, true);
