@@ -6,23 +6,18 @@
   "instantiatedScripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "https://github.com/Loleilo/leilo-backend",
   "author": "Sunny",
   "license": "ISC",
   "dependencies": {
-    "deep-assign": "latest",
-    "eventemitter2": "^4.1.2",
+    "obj-perms-engine": "latest",
+    "circular-json": "latest",
+    "eventemitter2": "latest",
     "eventemitterchain2": "latest",
-    "jsonfile": "latest",
-    "obj-perms-engine": "^2.3.0",
-    "object-assign-deep": "^0.3.1",
-    "object-path": "latest",
-    "password-hash": "latest",
-    "ws": "^3.1.0",
-    "vm2": "latest",
-    "abind": "latest",
     "auto-bind": "latest",
-    "uuid": "latest",
-    "circular-json": "latest"
+    "ws": "latest",
+    "vm2": "latest",
+    "password-hash": "latest"
   },
   "devDependencies": {
     "colors": "latest"
