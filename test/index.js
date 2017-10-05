@@ -1,4 +1,4 @@
-const WebSocket = require('ws');
+const sioc = require('socket.io-client');
 const funcOr = require("../app/util.js").funcOr;
 const waitAll = require("../app/util.js").funcAnd;
 const serverID = require("../app/config.js").serverID;
@@ -7,23 +7,23 @@ require('colors');
 require('../index');
 
 const testScript = fs.readFileSync('./testScript.js').toString();
-const ws = new WebSocket('ws://127.0.0.1:80');
-const ws2 = new WebSocket('ws://127.0.0.1:80');
-const ws3 = new WebSocket('ws://127.0.0.1:80');
+const ws = sioc('http://127.0.0.1:80');
+const ws2 = sioc('http://127.0.0.1:80');
+const ws3 = sioc('http://127.0.0.1:80');
 
 // const emt2 = new EventEmitter2();
 // const emt3 = new EventEmitter2();
 
 const s1 = (js) => {
-    ws.send(JSON.stringify(js));
+    ws.emit('message', JSON.stringify(js));
 };
 const s2 = (js) => {
     console.log(('< ' + JSON.stringify(js)).underline.blue);
-    ws2.send(JSON.stringify(js));
+    ws2.emit('message', JSON.stringify(js));
 };
 const s3 = (js) => {
     console.log(('< ' + JSON.stringify(js)).underline.green);
-    ws3.send(JSON.stringify(js));
+    ws3.emit('message', JSON.stringify(js));
 };
 
 const scriptTest = () => {
@@ -102,37 +102,38 @@ const openHandler = () => {
             level: 0,
         }
     });
-
-    s2({
-        username: 'root',
-        password: 'pass'
-    });
-
-    s2({
-        evt: {
-            name: 'createUser',
-            dst: serverID,
-        },
-        payload: {
-            username: 'sunny',
+    setTimeout(() => {
+        s2({
+            username: 'root',
             password: 'pass'
-        }
-    });
+        });
 
-    s3({
-        username: 'sunny',
-        password: 'pass'
-    });
+        s2({
+            evt: {
+                name: 'createUser',
+                dst: serverID,
+            },
+            payload: {
+                username: 'sunny',
+                password: 'pass'
+            }
+        });
+        setTimeout(() => {
+            s3({
+                username: 'sunny',
+                password: 'pass'
+            });
 
-    scriptTest();
-
+            scriptTest();
+        }, 100);
+    }, 100);
 };
 
 const wrapped = waitAll(openHandler, 3);
 
-ws.on('open', wrapped[0]);
-ws2.on('open', wrapped[1]);
-ws3.on('open', wrapped[2]);
+ws.on('connect', wrapped[0]);
+ws2.on('connect', wrapped[1]);
+ws3.on('connect', wrapped[2]);
 
 ws3.on('message', (msg) => {
     console.log(('> ' + msg).green);

@@ -3,15 +3,17 @@ const version = require('../package.json').version;
 const match = require('./evtTablesMatch');
 
 module.exports = {
+    serverPort: 80,
+
     serverID: "leilo", //username of server
 
     defaultPasswordHashes:{
         leilo: {
             passwordHash: "sha1$37dea33b$1$0ca2d75849f2731a8248054702a5f4e7d00abc22"
         },
-        root: {
-            passwordHash: "sha1$d403571a$1$3c5e41c8ce249b80d526ee9823dc4abc83509858"
-        },
+        // root: {
+        //     passwordHash: "sha1$d403571a$1$3c5e41c8ce249b80d526ee9823dc4abc83509858"
+        // },
     },
 
     version: version, //gives program easy access to current package version
@@ -33,7 +35,7 @@ module.exports = {
     //default value for max. number of listeners in event engine
     engineMaxListeners: 30,
 
-    persist: true, //whether to save server changes (make sure to set to false on debug)
+    persist: false, //whether to save server changes (make sure to set to false on debug)
 
     debugLevel: "normal", // can be none, short, normal, or verbose
 

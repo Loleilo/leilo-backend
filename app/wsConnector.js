@@ -1,4 +1,4 @@
-const WebSocket = require('ws');
+const sio = require('socket.io');
 const config = require('./config');
 const isValidLogin = require("./user.js").isValidLogin;
 const serverID = config.serverID;
@@ -13,29 +13,22 @@ module.exports = (engine) => {
     engine.on(['serverInit', serverID, serverID], () => {
         const state = engine.state;
         state.sandboxes = {};
-        const wss = new WebSocket.Server({port: 80});
+        const wss = sio.listen(config.serverPort);
         wss.on('connection', (ws) => {
             globalConnectionID++;
             const currConnectionID = "connection#" + globalConnectionID;
             ws.send(`tryAuth ${config.version}`);
 
+            wss.on('disconnect', () => engine.emit(['clientDisconnected', currConnectionID, currConnectionID]));
+
             //auto disconnects on implicit disconnect (socket closed without warning)
             const autoDisconnectAddListener = (emitter, evt, listener, id, once = false) => {
-                //wrapper emits client_disconnected when listener is called and ws is not open
-                const listenerWrapped = (...args) => {
-                    if (ws.readyState !== WebSocket.OPEN) {
-                        if (ws.disconnectEmitted)return;
-                        ws.disconnectEmitted = true;
-                        engine.emit(['clientDisconnected', id, serverID]);
-                    } else listener(...args);
-                };
-
                 //todo make this less custy
                 let func = emitter.on.bind(emitter);
                 if (once) func = emitter.once.bind(emitter);
 
-                let actualFunc = func(evt, listenerWrapped);
-                if (typeof(actualFunc) !== 'function') actualFunc = listenerWrapped;
+                let actualFunc = func(evt, listener);
+                if (typeof(actualFunc) !== 'function') actualFunc = listener;
 
                 //handler removes the listener
                 engine.once(['clientDisconnected', id, serverID],
@@ -55,6 +48,7 @@ module.exports = (engine) => {
                     engine.emit(['error', currConnectionID, serverID], {
                         err: new Error("Couldn't parse JSON")
                     });
+                    return;
                 }
 
                 if (msg !== undefined && isValidLogin(engine.state, msg)) {
@@ -110,7 +104,7 @@ module.exports = (engine) => {
                     engine.emit(['clientConnected', serverID, serverID], undefined, currClientID);
                 } else {
                     ws.send(`authRejected`);
-                    ws.close();
+                    ws.disconnect();
                 }
             };
 

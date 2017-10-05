@@ -10,14 +10,16 @@
   "author": "Sunny",
   "license": "ISC",
   "dependencies": {
-    "circular-json": "latest",
-    "obj-perms-engine": "^2.3.9",
-    "vm2": "latest",
     "auto-bind": "latest",
-    "eventemitterchain2": "latest",
+    "circular-json": "latest",
     "eventemitter2": "latest",
+    "eventemitterchain2": "latest",
+    "obj-perms-engine": "^2.3.9",
     "password-hash": "latest",
-    "ws": "latest"
+    "socket.io": "^2.0.3",
+    "vm2": "latest",
+    "ws": "latest",
+    "socket.io-client": "latest"
   },
   "devDependencies": {
     "colors": "latest"
