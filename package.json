@@ -1,6 +1,6 @@
 {
   "name": "leilo-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The backend to the Leilo project",
   "main": "index.js",
   "instantiatedScripts": {
