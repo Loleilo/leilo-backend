@@ -59,7 +59,7 @@ module.exports = (engine) => {
         });
     });
 
-    engine.on(['unsubscribe', '*', serverID], (payload, evt) => {
+    engine.on(['unsubscribe', '*', serverID], (payload) => {
         const state = engine.state;
         payload = Object.assign({}, defaultPayload, payload); //default perms
 
@@ -72,6 +72,6 @@ module.exports = (engine) => {
 
         //go through every event name listed
         for (let i = 0; i < evtNames.length; i++)
-            engine.removeAllListeners([evtNames[i], evtSrc, serverID, ...payload.path]);
+            engine.removeAllListeners([evtNames[i], evtSrc, serverID, config.pathMarker, ...payload.path]);
     });
 };
