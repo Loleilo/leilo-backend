@@ -1,20 +1,19 @@
-const Engine = require('./app/engine');
-const config = require('./app/config');
+const Engine = require('./modules/engine');
+const config = require('./modules/config');
 
-const obj = require('./app/obj');
-const subscribe = require('./app/subscribe');
-const wsConnector = require('./app/wsConnector');
-const user = require('./app/user');
-const debug = require('./app/debug');
-const persist = require('./app/persist');
-const scripts = require('./app/scripts');
-const gc = require('./app/gc');
-const evtTables = require('./app/evtTables');
-const funcOr = require("./app/util.js").funcOr;
+const obj = require('./modules/obj');
+const subscribe = require('./modules/subscribe');
+const wsConnector = require('./modules/wsConnector');
+const user = require('./modules/user');
+const persist = require('./modules/persist');
+const scripts = require('./modules/scripts');
+const gc = require('./modules/gc');
+const evtTables = require('./modules/evtTables');
+const funcOr = require("./modules/util.js").funcOr;
 
 const serverID = config.serverID;
 
-//main app
+//main modules
 module.exports = (_config) => {
     if (_config)
         Object.assign(config, _config);
@@ -29,7 +28,8 @@ module.exports = (_config) => {
     user.middleware(engine);
     scripts(engine);
     gc(engine);
-    debug(engine);
+    if (config.debugLevel !== 'none')
+        require('./modules/debug')(engine);
     wsConnector(engine);
 
     engine.once(['serverExit', serverID, serverID], () => setTimeout(process.exit, config.exitDelay));

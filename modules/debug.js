@@ -5,8 +5,6 @@ const pathMarker = require("./config.js").pathMarker;
 require('colors');
 module.exports = (engine) => {
     const debugHandler=(state, next, payload, evt) => {
-        if (debugLevel === 'none')
-            return;
         const color = evt.name === 'error' ? 'red' : 'yellow';
         if (debugLevel === 'short') {
             console.log(("Event occurred:" + evt.name

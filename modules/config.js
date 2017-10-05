@@ -38,9 +38,10 @@ module.exports = {
     saveInterval: -1,//amount of millis between autosave, -1 means don't autosave
     persistVersionRequirements: ">=0.0.0",
 
-    debugLevel: "normal", // can be none, short, normal, or verbose
+    debugLevel: "none", // can be none, short, normal, or verbose
 
     permsEngineOptions: {
+
         USER_LEVEL: {
             ROOT: 0,
             USER: 1,
