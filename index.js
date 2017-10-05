@@ -44,3 +44,7 @@ module.exports = (_config) => {
 
     console.log("Server is running");
 };
+
+if (require.main === module) {
+    module.exports();
+}

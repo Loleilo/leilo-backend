@@ -33,9 +33,10 @@ module.exports = (engine) => {
 
     if (config.persist) {
         engine.on(['saveServerState', serverID, serverID], () => {
-            console.log("Saving to location", config.saveLocation);
+            console.log("Saving to location", config.saveLocation, "...");
             fs.writeFile(config.saveLocation, JSON.stringify(engine.state), (err) => {
                 if (err) engine.emit(['error', serverID, serverID], {err: err});
+                console.log("Done.");
                 engine.emit(['saveStateFinished', serverID, serverID]);
             });
         });
