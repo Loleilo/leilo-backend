@@ -26,7 +26,7 @@ module.exports = (engine) => {
 
     //map server CRUD events to actual object modifications
 
-    engine.on(['updateUserLevel', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+    engine.on(['updateUserLevel', '*', serverID], (payload, evt) => {
         eng.updateUserLevel(evt.src, engine.state, payload.user, payload.level);
     });
 
