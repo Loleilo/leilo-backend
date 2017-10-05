@@ -10,14 +10,14 @@
   "author": "Sunny",
   "license": "ISC",
   "dependencies": {
-    "obj-perms-engine": "latest",
     "circular-json": "latest",
-    "eventemitter2": "latest",
-    "eventemitterchain2": "latest",
-    "auto-bind": "latest",
-    "ws": "latest",
+    "obj-perms-engine": "^2.3.9",
     "vm2": "latest",
-    "password-hash": "latest"
+    "auto-bind": "latest",
+    "eventemitterchain2": "latest",
+    "eventemitter2": "latest",
+    "password-hash": "latest",
+    "ws": "latest"
   },
   "devDependencies": {
     "colors": "latest"
