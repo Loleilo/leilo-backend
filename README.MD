@@ -103,9 +103,9 @@ deleteUser - deletes sending user
 
 ## todo
  - check what causes errors not to be shown, also error infinite loop
+ 1. fix persist bug
  1. make scripts named instead of uuid
  1. replace sandbox with evttables
- 2. add semantic version to file
  1. consider using promises
  4. security
       - Parameter checking system
