@@ -7,7 +7,7 @@ module.exports = {
 
     serverID: "leilo", //username of server
 
-    defaultPasswordHashes:{
+    defaultPasswordHashes: {
         leilo: {
             passwordHash: "sha1$37dea33b$1$0ca2d75849f2731a8248054702a5f4e7d00abc22"
         },
@@ -17,8 +17,6 @@ module.exports = {
     },
 
     version: version, //gives program easy access to current package version
-    saveLocation: `${__dirname}\\data\\state.json`, //where server state is stored on shutdown etc.
-    saveInterval: -1,//amount of millis between autosave, -1 means don't autosave
     pathMarker: 'path',//indicator of path in event array
     maxScriptTimeout: 1000, //maximum time a script instance can run synchronously for
 
@@ -35,7 +33,10 @@ module.exports = {
     //default value for max. number of listeners in event engine
     engineMaxListeners: 30,
 
-    persist: false, //whether to save server changes (make sure to set to false on debug)
+    persist: true, //whether to save server changes (make sure to set to false on debug)
+    saveLocation: `${__dirname}\\data\\state.json`, //where server state is stored on shutdown etc.
+    saveInterval: -1,//amount of millis between autosave, -1 means don't autosave
+    persistVersionRequirements: ">=0.0.0",
 
     debugLevel: "normal", // can be none, short, normal, or verbose
 
@@ -61,5 +62,5 @@ module.exports = {
         },
     ],
 
-    exitDelay: 200, //amount to wait before exiting
+    exitDelay: 500, //amount to wait before exiting
 };

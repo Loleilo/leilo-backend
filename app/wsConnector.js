@@ -77,11 +77,12 @@ module.exports = (engine) => {
                             clientSandbox.interface.emit(msg.evt, msg.payload);
 
                             //ack callback
-                            if (callback)
+                            if (callback) {
                                 engine.onM(toArr(msg.evt), (state, next) => {
                                     next(state);
                                     callback();
                                 });
+                            }
                         } catch (err) {
                             engine.emit(['error', currClientID, currClientID], {
                                 err: err.toString()

@@ -103,7 +103,6 @@ deleteUser - deletes sending user
 
 ## todo
  - check what causes errors not to be shown, also error infinite loop
- 1. fix package interface
  1. make scripts named instead of uuid
  1. replace sandbox with evttables
  2. add semantic version to file

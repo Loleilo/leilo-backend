@@ -15,7 +15,9 @@ const funcOr = require("./app/util.js").funcOr;
 const serverID = config.serverID;
 
 //main app
-module.exports = () => {
+module.exports = (_config) => {
+    if (_config)
+        Object.assign(config, _config);
 
     const engine = new Engine();
 
@@ -31,7 +33,7 @@ module.exports = () => {
     wsConnector(engine);
 
     engine.once(['serverExit', serverID, serverID], () => setTimeout(process.exit, config.exitDelay));
-    const h=funcOr(() => engine.emit(['serverExit', serverID, '*']), 5, true);
+    const h = funcOr(() => engine.emit(['serverExit', serverID, '*']), 5, true);
     process.once('exit', h[0]);
     process.once('SIGINT', h[1]);
     process.once('SIGUSR1', h[2]);

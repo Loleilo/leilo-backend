@@ -1,7 +1,8 @@
 const config = require('./config');
-const serverID = config.serverID;
 const fs = require('fs');
 const JSON = require('circular-json');
+const semver = require('semver');
+const serverID = config.serverID;
 
 module.exports = (engine) => {
     //must run first
@@ -12,6 +13,12 @@ module.exports = (engine) => {
                     obj = JSON.parse(obj);
                 } catch (err) {
                     engine.emitNext(['warning', serverID, serverID], {err: err, srcEvt: evt});
+                    obj = undefined;
+                }
+                if (obj && !semver.satisfies(obj.version, config.persistVersionRequirements)) {
+                    engine.emit(['errorOccurred', serverID, serverID], {
+                        err: new Error('Save file version mismatch')
+                    });
                     obj = undefined;
                 }
                 if (!obj) obj = {version: config.version};

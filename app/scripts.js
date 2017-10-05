@@ -20,7 +20,7 @@ module.exports = (engine) => {
             for (const script in user.scripts) {
                 if (!user.scripts.hasOwnProperty(script)) continue;
                 user.scripts[script].running = false;
-                engine.emit(['scriptStart', serverID, serverID], {
+                engine.emitNext(['scriptStart', serverID, serverID], {
                     scriptInstanceID: script
                 });
             }

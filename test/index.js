@@ -14,16 +14,16 @@ const ws3 = sioc('http://127.0.0.1:80');
 // const emt2 = new EventEmitter2();
 // const emt3 = new EventEmitter2();
 
-const s1 = (js) => {
-    ws.emit('message', JSON.stringify(js));
+const s1 = (js, callback) => {
+    ws.emit('message', JSON.stringify(js), callback);
 };
-const s2 = (js) => {
+const s2 = (js, callback) => {
     console.log(('< ' + JSON.stringify(js)).underline.blue);
-    ws2.emit('message', JSON.stringify(js));
+    ws2.emit('message', JSON.stringify(js), callback);
 };
-const s3 = (js) => {
+const s3 = (js, callback) => {
     console.log(('< ' + JSON.stringify(js)).underline.green);
-    ws3.emit('message', JSON.stringify(js));
+    ws3.emit('message', JSON.stringify(js), callback);
 };
 
 const scriptTest = () => {
@@ -90,7 +90,7 @@ const openHandler = () => {
             username: 'root',
             password: 'pass'
         }
-    });
+    }, () => console.log('ack callback called'));
 
     s1({
         evt: {
