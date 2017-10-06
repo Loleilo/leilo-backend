@@ -57,6 +57,15 @@ requestElevated, pathed - emitted by script to request permissions from user
  - path - the id of the request
  - payload - the event the script wants the user to emit
  
+requestAccepted - tells server to accept requestElevated
+ - firstReqID - the id of the first request to accept (to prevent concurrency errors)
+ - responseLst - array of responses to requests
+    - must be shorter or equal in length to response queue length
+    - 3 possible vals: 
+        - "accept" - run request
+        - "reject" - don't run request
+        - "skip" - tell script request was run, but don't actually run (may break stuff)
+ 
 initDone - event script should emit when done setting up
 
 initRun - event tells script that it should setup
@@ -71,6 +80,9 @@ instantiateScript - creates a script instance
      - runFromPath - run from code stored in state
         - scriptPath - path to get code from
      - code - only needed if runFromPath is false
+     
+scriptInstantiated - fired by server when script instance is ready to be run
+ - payload should contain id of script just instantiated
      
 ### subscribe
 
@@ -110,6 +122,7 @@ deleteUser - deletes sending user
  1. consider using promises
  4. security
       - Parameter checking system
+ 1. look into 
  1. Create documentation
  1. optimize ws usage/ number of events that are sent
  1. make obj events universal (aka no converting except in engine) <-- cancer
