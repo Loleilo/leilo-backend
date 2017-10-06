@@ -40,8 +40,9 @@ module.exports.middleware = (engine) => {
     });
 
     engine.on(['deleteUser', '*', serverID], (payload, evt) => {
-        engine.state.passwordHashes[evt.src] = null;
-        engine.emitNext(['userDeleted', serverID, evt.src]);
+        engine.state.passwordHashes[evt.src] = undefined;//todo move this to gc job
+        engine.emit(['userDeleted', serverID, evt.src]);
+        engine.emitNext(['forceDisconnect', serverID, evt.src]);
     });
 };
 

@@ -117,8 +117,9 @@ deleteUser - deletes sending user
  - check what causes errors not to be shown, also error infinite loop
  1. fix config model
  1. refactor everything to use gc
- 1. make scripts named instead of uuid
- 1. replace sandbox with evttables <-cust
+ 1. use once whenever possible (save number of listeners)
+ 1. make scripts named instead of uuid, rename scriptInstatiated
+ 1. allow root users to change password of user, delete user, etc
  1. consider using promises
  4. security
       - Parameter checking system

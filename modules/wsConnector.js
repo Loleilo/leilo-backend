@@ -20,11 +20,10 @@ module.exports = (engine) => {
             const currConnectionID = "connection#" + globalConnectionID;
             ws.send(`tryAuth ${config.version}`);
 
-            wss.on('disconnect', () => engine.emit(['clientDisconnected', currConnectionID, currConnectionID]));
+            ws.once('disconnect', () => engine.emit(['clientDisconnected', currConnectionID, currConnectionID]));
 
             //auto disconnects on implicit disconnect (socket closed without warning)
             const autoDisconnectAddListener = (emitter, evt, listener, id, once = false) => {
-                //todo make this less custy
                 let func = emitter.on.bind(emitter);
                 if (once) func = emitter.once.bind(emitter);
 
@@ -111,6 +110,13 @@ module.exports = (engine) => {
 
                     //send client connected event
                     engine.emit(['clientConnected', serverID, serverID], undefined, currClientID);
+
+                    //forceDisconnect
+                    autoDisconnectAddListener(engine, {
+                        name: 'forceDisconnect',
+                        src: serverID,
+                        dst: currClientID
+                    }, ws.disconnect, currConnectionID, true);
                 } else {
                     ws.send(`authRejected`);
                     ws.disconnect();
