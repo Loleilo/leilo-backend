@@ -46,5 +46,7 @@ module.exports = (_config) => {
 };
 
 if (require.main === module) {
-    module.exports();
+    module.exports({
+        // debugLevel: "normal",
+    });
 }

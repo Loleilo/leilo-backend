@@ -5,7 +5,7 @@ const config = require('./config');
 let toObj = require("./pathed").toObj;
 const serverID = config.serverID;
 const abind = require('auto-bind');
-const evtType = require("./pathed.js").evtType;
+const pathed=require('./pathed');
 
 const defaultConf = {
     wildcard: true, //enable wildcards in event name
@@ -50,35 +50,49 @@ class Engine extends EventEmitter2 {
         };
     }
 
-    //registers a callback into the middleware chain
-    onM(evt, callback) {
-        this._checkInvalid(evt);
-        this.pendingEmitter.on(evt, this._createHandler(callback))
-    };
-
-    onceM(evt, callback) {
-        this._checkInvalid(evt);
-        this.pendingEmitter.once(evt, this._createHandler(callback))
-    }
-
-    _checkInvalid(evt) {
-        if (evtType(evt) === 'invalid') {
+    _checkInvalid(evt, defaultParams=[undefined, '*', '*']) {
+        if (pathed.evtType(evt) === 'invalid') {
             this.emit(['error', serverID, serverID], {
                 err: new Error('Invalid event'),
                 srcEvt: evt,
             });
         }
+
+        if (!Array.isArray(evt))
+            evt = pathed.toArr(evt);
+
+        for (let i = 0; i < defaultParams.length; i++)
+            if (evt[i] === undefined)
+                evt[i] = defaultParams[i];
+
+        return evt;
+    }
+
+    //registers a callback into the middleware chain
+    onM(evt, callback) {
+        evt=this._checkInvalid(evt);
+        this.pendingEmitter.on(evt, this._createHandler(callback))
+    };
+
+    onceM(evt, callback) {
+        evt=this._checkInvalid(evt);
+        this.pendingEmitter.once(evt, this._createHandler(callback))
+    }
+
+    on(evt, ...args) {
+        evt = this._checkInvalid(evt);
+        super.on(evt, ...args);
+    }
+
+    once(evt, ...args) {
+        evt = this._checkInvalid(evt);
+        super.once(evt, ...args);
     }
 
     emit(evt, payload) {
         //ignore internal events
         if (evt === 'newListener' || evt === 'removeListener')return;
-        this._checkInvalid(evt);
-
-        const defaultParams = [undefined, '*', '*'];
-        for (let i = 0; i < defaultParams.length; i++)
-            if (evt[i] === undefined)
-                evt[i] = defaultParams[i];
+        evt=this._checkInvalid(evt);
 
         this.pendingEmitter.emit(evt, payload, toObj(evt));
     }

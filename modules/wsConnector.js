@@ -77,7 +77,7 @@ module.exports = (engine) => {
                             clientSandbox.interface.emit(msg.evt, msg.payload);
 
                             //ack callback
-                            if (callback) {
+                            if (typeof(callback) === 'function') {
                                 engine.onM(toArr(msg.evt), (state, next) => {
                                     next(state);
                                     callback();
