@@ -173,14 +173,14 @@ module.exports = (engine) => {
             requestQueue: [],
         });
 
-        //run script
-        engine.emit(['scriptStart', evt.src, serverID], {
+        //send new script id back to user
+        //todo rename to scriptInstantiating
+        engine.emit(['scriptInstantiated', serverID, evt.src], {
             scriptInstanceID: scriptInstanceID,
         });
 
-        //send new script id back to user
-        //todo script is not really instantiated yet
-        engine.emit(['scriptInstantiated', serverID, evt.src], {
+        //run script
+        engine.emit(['scriptStart', evt.src, serverID], {
             scriptInstanceID: scriptInstanceID,
         });
     });

@@ -43,7 +43,7 @@ const scriptTest = () => {
     setTimeout(() => {
         s3({
             evt: {
-                name: "requestAccepted",
+                name: "requestResponse",
                 dst: '*',
             },
             payload: {
@@ -55,7 +55,7 @@ const scriptTest = () => {
     setTimeout(() => {
         s3({
             evt: {
-                name: "requestAccepted",
+                name: "requestResponse",
                 dst: '*',
             },
             payload: {
