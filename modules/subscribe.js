@@ -26,9 +26,11 @@ module.exports = (engine) => {
             if (payload.path[firstIdx] === '*' || payload.path[firstIdx] === '**')
                 break;
 
+        const actualPath = payload.path.slice(0, firstIdx);
+
         //check permissions on prefix path
         //todo doesn't need viewer perms for viewing update
-        if (state.readPerms(state, payload.path.slice(0, firstIdx), evt.src).lvl < PERMS.VIEWER)
+        if (state.readPerms(state, actualPath, evt.src).lvl < PERMS.VIEWER)
             throw new PermissionError('Not enough perms');
 
         //convert single event name to array for easier processing
@@ -48,7 +50,7 @@ module.exports = (engine) => {
         }
 
         //init subscriber
-        engine.emit(['subscribeSync', evt.src, serverID, config.pathMarker, ...payload.path]);
+        engine.emit(['subscribeSync', evt.src, serverID, config.pathMarker, ...actualPath]);
     });
 
     //event is used to initially load the state into client
