@@ -1,9 +1,9 @@
-const debugLevel = require('./config').debugLevel;
 const JSON = require('circular-json');
-const pathMarker = require("./config.js").pathMarker;
-//handles a client websocket connection
+const pathMarker = require("../defaultConfig.js").sharedConsts.pathMarker;
+require('longjohn');
 require('colors');
-module.exports = (engine) => {
+module.exports = (engine, config) => {
+    const debugLevel = config.debugLevel;
     const debugHandler = (state, next, payload, evt) => {
         const color = evt.name === 'error' || evt.name === 'warning' ? 'red' : 'yellow';
         if (debugLevel === 'short') {

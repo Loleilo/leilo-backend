@@ -1,16 +1,15 @@
 const sio = require('socket.io');
-const config = require('./config');
 const isValidLogin = require("./user.js").isValidLogin;
-const serverID = config.serverID;
 const Sandbox = require('./sandbox').Sandbox;
 const JSON = require('circular-json');
-require('colors');
 const toArr = require("./pathed.js").toArr;
 
 let globalConnectionID = 0;
 
 //handles a client websocket connection
-module.exports = (engine) => {
+module.exports = (engine, config) => {
+    const serverID = config.serverID;
+
     engine.on(['serverInit', serverID, serverID], () => {
         const state = engine.state;
         state.sandboxes = {};
@@ -18,7 +17,7 @@ module.exports = (engine) => {
         wss.on('connection', (ws) => {
             globalConnectionID++;
             const currConnectionID = "connection#" + globalConnectionID;
-            ws.send(`tryAuth ${config.version}`);
+            ws.send(`tryAuth ${config.serverVersion}`);
 
             ws.once('disconnect', () => engine.emit(['clientDisconnected', currConnectionID, currConnectionID]));
 
@@ -34,11 +33,6 @@ module.exports = (engine) => {
                 engine.once(['clientDisconnected', id, serverID],
                     () => emitter.removeListener(evt, actualFunc));
             };
-
-            //display disconnected message
-            engine.once(['clientDisconnected', currConnectionID, currConnectionID], () => {
-                console.log(`Client @${currConnectionID} disconnected`);
-            });
 
             const messageHandler = (data) => {
                 let msg;
@@ -56,7 +50,6 @@ module.exports = (engine) => {
 
                     //store current client username
                     const currClientID = msg.username;
-                    console.log(`User @${currClientID} authenticated`);
 
                     //create sandbox for client
                     let clientSandbox;

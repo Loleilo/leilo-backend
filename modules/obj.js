@@ -1,12 +1,11 @@
 const obj_perms_engine = require('obj-perms-engine');
-const config = require('./config');
-const serverID = config.serverID;
-
 const ObjPermsEngine = obj_perms_engine.ObjPermsEngine;
 
-const eng = new ObjPermsEngine(config.permsEngineOptions);
+module.exports = (engine, config) => {
+    const eng = new ObjPermsEngine(config.permsEngineOptions);
 
-module.exports = (engine) => {
+    const serverID = config.serverID;
+
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
         //give server root perms todo make this less hardcode
         eng.u_updateUserLevel(serverID, state, config.permsEngineOptions.USER_LEVEL.ROOT);

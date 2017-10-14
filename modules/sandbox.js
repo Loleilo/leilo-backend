@@ -12,7 +12,7 @@ class SandboxError extends Error {
 }
 module.exports.SandboxError = SandboxError;
 
-const _scopeDst = (evt)=> {
+const _scopeDst = (evt) => {
     const type = pathed.evtType(evt);
     if (type === 'invalid')throw new SandboxError("Invalid event");
     return pathed.toArr(evt);
@@ -36,7 +36,7 @@ class Sandbox {
                 once: this._sandboxify(this._once),
                 removeListener: this._sandboxify(this._removeListener),
             };
-        }catch(e){
+        } catch (e) {
             console.log(e);
         }
 
@@ -45,15 +45,15 @@ class Sandbox {
     }
 
     //wraps a function with some checks
-    _sandboxify(func, dir="dst") {
+    _sandboxify(func, dir = "dst") {
         return (evt, ...args) => {
             if (this.disabled)
                 throw new SandboxError('Interface disabled');
-            if(dir==='src')
+            if (dir === 'src')
                 if (this.options.forceSendIdentity) evt = a(evt, {
                     src: this._userID // force src to be this user
                 });
-            if(dir==="dst")
+            if (dir === "dst")
                 if (this.options.forceReceiveIdentity) evt = a(evt, {
                     dst: this._userID // force dst to be this user
                 });

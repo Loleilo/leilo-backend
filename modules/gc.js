@@ -1,10 +1,12 @@
 //simply syntactic sugar to help garbage collect
-const config = require('./config');
-const toObj = require("./pathed.js").toObj;
-const serverID = config.serverID;
-const USER_LEVEL = config.permsEngineOptions.USER_LEVEL;
 
-module.exports = (engine) => {
+const toObj = require("./pathed.js").toObj;
+
+module.exports = (engine, config) => {
+
+    const serverID = config.serverID;
+    const USER_LEVEL = config.permsEngineOptions.USER_LEVEL;
+
     //todo allow obj
     engine.on(['gc', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
         const state = engine.state;

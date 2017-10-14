@@ -1,7 +1,7 @@
 const sioc = require('socket.io-client');
 const funcOr = require("../modules/util.js").funcOr;
 const waitAll = require("../modules/util.js").funcAnd;
-const serverID = require("../modules/config.js").serverID;
+const serverID = require("../defaultConfig.js").sharedConsts.serverID;
 const fs = require('fs');
 require('colors');
 require('../index')({

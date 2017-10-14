@@ -1,38 +1,48 @@
 const Engine = require('./modules/engine');
-const config = require('./modules/config');
+const defaultConfig = require('./defaultConfig');
 
-const obj = require('./modules/obj');
-const subscribe = require('./modules/subscribe');
-const wsConnector = require('./modules/wsConnector');
-const user = require('./modules/user');
-const persist = require('./modules/persist');
-const scripts = require('./modules/scripts');
-const gc = require('./modules/gc');
-const evtTables = require('./modules/evtTables');
-const funcOr = require("./modules/util.js").funcOr;
-
-const serverID = config.serverID;
+const util = require("./modules/util.js");
+const funcOr = util.funcOr;
+const d = util.getDefault;
 
 //main modules
-module.exports = (_config) => {
-    if (_config)
-        Object.assign(config, _config);
+module.exports = (_config = {}) => {
 
-    const engine = new Engine();
+    let sharedConfig = Object.assign({}, defaultConfig.sharedConsts, d(_config.sharedConsts, {}));
+    let serverConfig = Object.assign({}, defaultConfig.serverConfig, d(_config.serverConfig, {}));
+    let globalConfig = Object.assign({}, sharedConfig, serverConfig);
 
-    if (config.persist)
-        persist(engine);
-    evtTables.evtTable(engine);
-    obj(engine);
-    subscribe(engine);
-    user.middleware(engine);
-    scripts(engine);
-    gc(engine);
-    if (config.debugLevel !== 'none')
-        require('./modules/debug')(engine);
-    wsConnector(engine);
+    let modules = d(_config.modules, defaultConfig.modules);
 
-    engine.once(['serverExit', serverID, serverID], () => setTimeout(process.exit, config.exitDelay));
+    const serverID = globalConfig.serverID;
+
+    const engine = new Engine(globalConfig);
+
+    for (let i = 0; i < modules.length; i++) {
+        const module = modules[i];
+        const config = Object.assign({}, globalConfig, module);
+
+        let enabled = false;
+        if (config.enable === "ALWAYS")
+            enabled = true;
+        else if (config.enable === "DEV" && process.env.NODE_ENV !== 'production')
+            enabled = true;
+        else if(config.enable==="PRODUCTION" && process.env.NODE_ENV === 'production')
+            enabled=true;
+
+        if (enabled === true) {
+            let moduleName = module.__moduleName;
+            let moduleActual;
+            if (moduleName.funcName === undefined)
+                moduleActual = require("./modules/" + moduleName);
+            else
+                moduleActual = require("./modules/" + moduleName.fileName)[moduleName.funcName];
+
+            moduleActual(engine, config);
+        }
+    }
+
+    engine.once(['serverExit', serverID, serverID], () => setTimeout(process.exit, defaultConfig.exitDelay));
     const h = funcOr(() => engine.emit(['serverExit', serverID, '*']), 5, true);
     process.once('exit', h[0]);
     process.once('SIGINT', h[1]);
@@ -46,8 +56,5 @@ module.exports = (_config) => {
 };
 
 if (require.main === module) {
-    module.exports({
-        debugLevel: "normal",
-        persist: false,
-    });
+    module.exports();
 }

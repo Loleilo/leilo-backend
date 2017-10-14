@@ -1,11 +1,7 @@
 // subscribe.js  - Allows clients to see CRUD events on parts of object they are allowed to view
 // This is needed because CRUD events are only sent to the server unless sender specifies otherwise
 
-const config = require('./config');
 const PermissionError = require('obj-perms-engine').PermissionError;
-const serverID = require('./config').serverID;
-
-const PERMS = config.permsEngineOptions.permsModule.PERMS;
 
 //payload may contain an array in evt as the list of operations to redirect
 const defaultPayload = {
@@ -13,7 +9,10 @@ const defaultPayload = {
     src: '*',
 };
 
-module.exports = (engine) => {
+module.exports = (engine, config) => {
+    const serverID = config.serverID;
+    const PERMS = config.permsEngineOptions.permsModule.PERMS;
+
     //todo prevent duplicate subscribes
     // allows a client to subscribe to state change events if they have read perms
     engine.on(['subscribe', '*', serverID], (payload, evt) => {

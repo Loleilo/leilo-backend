@@ -1,15 +1,15 @@
-const config = require('./config');
 const Sandbox = require("./sandbox.js").Sandbox;
 const d = require('./util').getDefault;
-const serverID = config.serverID;
 const {VM} = require('vm2');
 const uuid4 = require('uuid/v4');
 const toArr = require("./pathed.js").toArr;
 const PermissionError = require("obj-perms-engine").PermissionError;
-const PERMS = config.permsEngineOptions.permsModule.PERMS;
-const USER_LEVEL=config.permsEngineOptions.USER_LEVEL;
 
-module.exports = (engine) => {
+module.exports = (engine, config) => {
+    const serverID = config.serverID;
+    const PERMS = config.permsEngineOptions.permsModule.PERMS;
+    const USER_LEVEL = config.permsEngineOptions.USER_LEVEL;
+
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
         //for each user
         for (const username in state.users) {
