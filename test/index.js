@@ -4,10 +4,7 @@ const waitAll = require("../modules/util.js").funcAnd;
 const serverID = require("../defaultConfig.js").sharedConsts.serverID;
 const fs = require('fs');
 require('colors');
-require('../index')({
-    persist: false,
-    debugLevel: "normal",
-});
+require('../index')();
 
 const testScript = fs.readFileSync('./testScript.js').toString();
 const ws = sioc('http://127.0.0.1:80');
