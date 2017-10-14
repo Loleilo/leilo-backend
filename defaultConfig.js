@@ -1,5 +1,5 @@
 const perms = require('obj-perms-engine').NVEOPerms;
-const version = require('./package.json').serverVersion;
+const version = require('./package.json').version;
 const match = require('./modules/evtTablesMatch');
 
 module.exports = {

@@ -14,13 +14,13 @@ module.exports = (engine, config) => {
                 engine.emitNext(['warning', serverID, serverID], {err: err, srcEvt: evt});
                 obj = undefined;
             }
-            if (obj && !semver.satisfies(obj.serverVersion, config.persistVersionRequirements)) {
+            if (obj && !semver.satisfies(obj.version, config.persistVersionRequirements)) {
                 engine.emit(['errorOccurred', serverID, serverID], {
                     err: new Error('Save file serverVersion mismatch')
                 });
                 obj = undefined;
             }
-            if (!obj) obj = {serverVersion: config.serverVersion};
+            if (!obj) obj = {version: config.version};
             if (config.saveInterval > 0)
                 obj.saveTimer = setInterval(() => engine.emit(['saveServerState', serverID, serverID]), config.saveInterval);
             next(obj);
