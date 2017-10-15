@@ -10,11 +10,12 @@ const serverID = consts.serverID;
 //Adds some syntactic sugar to make middleware easy
 //Also allows cancel, emit, etc. nice functions (cancel is only for middleware)
 class Engine extends EventEmitter2 {
-    constructor(config, initState = {}) {
+    constructor(config) {
         super(config.engine);
         abind(this);
 
-        this.state = initState;
+        this.state = config.engine.initState;
+        this.config=config;
 
         // const actualSuper = super;
         //handles events for middleware (aka before actual event is run)
@@ -23,7 +24,7 @@ class Engine extends EventEmitter2 {
     }
 
     _createHandler(callback) {
-        return (next, payload, evt) => {
+        return (next, payload, evt, callbackInner) => {
             try {
                 callback(
                     this.state,
@@ -33,7 +34,8 @@ class Engine extends EventEmitter2 {
                         next();
                     },
                     payload,
-                    evt
+                    evt,
+                    callbackInner
                 )
             } catch (err) {
                 this.emit(['error', serverID, evt.src], {
@@ -44,7 +46,7 @@ class Engine extends EventEmitter2 {
         };
     }
 
-    _checkInvalid(evt, defaultParams = [undefined, '*', '*']) {
+    _checkInvalid(evt, defaultParams = this.config.engine.defaultEvt) {
         if (pathed.evtType(evt) === 'invalid') {
             this.emit(['error', serverID, serverID], {
                 err: new Error('Invalid event'),
@@ -83,12 +85,12 @@ class Engine extends EventEmitter2 {
         super.once(evt, ...args);
     }
 
-    emit(evt, payload) {
+    emit(evt, payload, callback) {
         //ignore internal events
         if (evt === 'newListener' || evt === 'removeListener')return;
-        evt = this._checkInvalid(evt);
+        evt = this._checkInvalid(evt, this.config.engine.emitDefaultEvt);
 
-        this.pendingEmitter.emit(evt, payload, pathed.toObj(evt));
+        this.pendingEmitter.emit(evt, payload, pathed.toObj(evt), callback);
     }
 
     emitNext(...args) {

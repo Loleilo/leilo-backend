@@ -20,7 +20,9 @@ module.exports = {
             WILDCARD: '*',
             permsModule: perms,
         },
+    },
 
+    localConsts: {
         serverVersion: version, //gives program easy access to current package serverVersion
     },
 
@@ -38,11 +40,14 @@ module.exports = {
         },
 
         engine: {
+            initState: {},
             wildcard: true, //enable wildcards in event name
             maxListeners: 30,
+            defaultEvt: [undefined, '*', '*'],
+            emitDefaultEvt: undefined,
         },
 
-        // exitDelay: 500, //amount to wait before exiting
+        exitDelay: 500, //amount to wait before exiting
     },
 
     //module configs
