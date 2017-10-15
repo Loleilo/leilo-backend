@@ -1,4 +1,4 @@
-const pathMarker = require('../defaultConfig').sharedConsts.pathMarker;
+const pathMarker = require('./defaultConfig').sharedConsts.pathMarker;
 let d = require('./util').getDefault;
 
 module.exports.evtType = (evt) => {

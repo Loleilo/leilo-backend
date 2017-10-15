@@ -2,7 +2,7 @@ const sio = require('socket.io');
 const isValidLogin = require("./user.js").isValidLogin;
 const Sandbox = require('./sandbox').Sandbox;
 const JSON = require('circular-json');
-const toArr = require("./pathed.js").toArr;
+const toArr = require("../pathed.js").toArr;
 
 let globalConnectionID = 0;
 

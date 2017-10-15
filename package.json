@@ -15,6 +15,7 @@
     "circular-json": "latest",
     "eventemitter2": "latest",
     "eventemitterchain2": "latest",
+    "lodash": "^4.17.4",
     "obj-perms-engine": "^2.3.9",
     "password-hash": "latest",
     "semver": "^5.4.1",

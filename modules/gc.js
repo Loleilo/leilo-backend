@@ -1,6 +1,6 @@
 //simply syntactic sugar to help garbage collect
 
-const toObj = require("./pathed.js").toObj;
+const toObj = require("../pathed.js").toObj;
 
 module.exports = (engine, config) => {
 

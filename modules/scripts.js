@@ -1,8 +1,8 @@
 const Sandbox = require("./sandbox.js").Sandbox;
-const d = require('./util').getDefault;
+const d = require('../util').getDefault;
 const {VM} = require('vm2');
 const uuid4 = require('uuid/v4');
-const toArr = require("./pathed.js").toArr;
+const toArr = require("../pathed.js").toArr;
 const PermissionError = require("obj-perms-engine").PermissionError;
 
 module.exports = (engine, config) => {

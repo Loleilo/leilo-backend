@@ -1,5 +1,5 @@
 const PasswordHash = require('password-hash');
-const d = require('./util').getDefault;
+const d = require('../util').getDefault;
 
 module.exports.middleware = (engine, config) => {
     const serverID = config.serverID;

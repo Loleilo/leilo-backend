@@ -1,6 +1,6 @@
 const perms = require('obj-perms-engine').NVEOPerms;
 const version = require('./package.json').version;
-const match = require('./modules/evtTablesMatch');
+const match = require('./evtTablesMatch');
 
 module.exports = {
 
@@ -26,7 +26,7 @@ module.exports = {
 
     //server only config
 
-    serverConfig: {
+    localConfig: {
         serverPort: 80,
 
         enable: "ALWAYS", //enable all modules by default
@@ -37,25 +37,38 @@ module.exports = {
             },
         },
 
-        engine:{
+        engine: {
             wildcard: true, //enable wildcards in event name
             maxListeners: 30,
         },
+
+        // exitDelay: 500, //amount to wait before exiting
     },
 
     //module configs
 
-    modules: [
-        {
+    moduleOrder: [
+        "persist",
+        "evtTables",
+        "obj",
+        "subscribe",
+        "user",
+        "scripts",
+        "gc",
+        "wsConnector",
+        "debug",
+    ],
+
+    modules: {
+        persist: {
             enable: "PRODUCTION",
             __moduleName: "persist",
             saveLocation: `${__dirname}\\data\\state.json`, //where server state is stored on shutdown etc.
             saveInterval: -1,//amount of millis between autosave, -1 means don't autosave
             persistVersionRequirements: ">=0.0.0",
-            exitDelay: 500, //amount to wait before exiting
         },
 
-        {
+        evtTables: {
             __moduleName: "evtTables",
             defaultEvtRules: [
                 { //accept all root events
@@ -70,22 +83,22 @@ module.exports = {
             ],
         },
 
-        {
+        obj: {
             __moduleName: "obj",
         },
 
-        {
+        subscribe: {
             __moduleName: "subscribe",
         },
 
-        {
+        user: {
             __moduleName: {
                 fileName: "user",
                 funcName: "middleware",
             },
         },
 
-        {
+        scripts: {
             __moduleName: "scripts",
             maxScriptTimeout: 1000, //maximum time a script instance can run synchronously for
 
@@ -100,18 +113,18 @@ module.exports = {
             globalVMOptions: {},
         },
 
-        {
+        gc: {
             __moduleName: "gc",
         },
 
-        {
+        wsConnector: {
             __moduleName: "wsConnector",
         },
 
-        {
+        debug: {
             __moduleName: "debug",
-            enable: "DEV",
+            enable: "DEVELOPMENT",
             debugLevel: "normal", // can be none, short, normal, or verbose
         },
-    ],
+    },
 };
