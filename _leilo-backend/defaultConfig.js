@@ -23,7 +23,7 @@ module.exports = {
             emitDefaultEvt: undefined,
         },
 
-        exitDelay: 500, //amount to wait before exiting
+        exitDelay: 400, //amount to wait before exiting
     },
 
     //module configs
@@ -42,7 +42,7 @@ module.exports = {
 
     modules: {
         persist: {
-            enable: "PRODUCTION",
+            // enable: "PRODUCTION",
             __moduleName: "persist",
             saveLocation: `${__dirname}\\data\\state.json`, //where server state is stored on shutdown etc.
             saveInterval: -1,//amount of millis between autosave, -1 means don't autosave

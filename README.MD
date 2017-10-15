@@ -80,6 +80,7 @@ subscribe - causes subscribed crud events to be copied and sent to client
      -  if undefined, will be set to all crud events
  - src - src of event to subscribe to
  - path - path to subscribe to
+ - dst - dst of event to subscribe to
  
 subscribeSync, pathed - tells server to send sync update to client
  - path - the path of the object to sync
@@ -101,6 +102,7 @@ deleteUser - deletes sending user
 # stuff for me
 
 ## todo
+ 1. extract core functionality to another package
  1. make option for server to send events back to client that client has send
      - allows pessimistic mode
  1. refactor everything to use gc

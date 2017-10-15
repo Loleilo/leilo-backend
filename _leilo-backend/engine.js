@@ -15,7 +15,7 @@ class Engine extends EventEmitter2 {
         abind(this);
 
         this.state = config.engine.initState;
-        this.config=config;
+        this.config = config;
 
         // const actualSuper = super;
         //handles events for middleware (aka before actual event is run)

@@ -11,6 +11,7 @@ const pathMarker = consts.pathMarker;
 const defaultPayload = {
     name: ['update', 'delete', 'create', 'updatePerms'],
     src: '*',
+    dst: serverID,
 };
 
 module.exports = (engine, config) => {
@@ -38,16 +39,17 @@ module.exports = (engine, config) => {
         if (!Array.isArray(payload.name))
             payload.name = [payload.name];
 
-        const evtNames = payload.name;
-        const evtSrc = payload.src;
+        const listenNames = payload.name;
+        const listenSrc = payload.src;
+        const listenDst = payload.dst;
 
         //go through every event name listed
-        for (let i = 0; i < evtNames.length; i++) {
+        for (let i = 0; i < listenNames.length; i++) {
             //listener remaps event to send to subscriber
             const listener = (payloadInner, evtInner) => {
-                engine.emit([evtInner.name, evtInner.src, evt.src, pathMarker, ...evtInner.path], payloadInner);
+                engine.emit([evtInner.name, listenDst, evt.src, pathMarker, ...evtInner.path], payloadInner);
             };
-            engine.on([evtNames[i], evtSrc, serverID, pathMarker, ...payload.path], listener);
+            engine.on([listenNames[i], listenSrc, listenDst, pathMarker, ...payload.path], listener);
         }
 
         //init subscriber
