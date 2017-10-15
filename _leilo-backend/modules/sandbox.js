@@ -1,5 +1,5 @@
 const abind = require("auto-bind");
-const pathed = require("../pathed.js");
+const pathed = require("../../pathed.js");
 const a = Object.assign;
 
 const defaultOptions = {

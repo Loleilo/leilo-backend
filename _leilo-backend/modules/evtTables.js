@@ -1,12 +1,15 @@
 //this will block/accept events depending on user
 //todo make rules serializable
 
+const consts = require('../../consts');
+const serverID = consts.serverID;
+const pathMarker = consts.pathMarker;
+
 module.exports = (engine, config) => {
-    const serverID = config.serverID;
 
     engine.on(['serverInit', serverID, serverID], () => {
         engine.state.evtRules = config.defaultEvtRules;
-        engine.emitNext(['gc', serverID, serverID, config.pathMarker, 'evtRules'], ['serverExit', serverID, serverID]);
+        engine.emitNext(['gc', serverID, serverID, pathMarker, 'evtRules'], ['serverExit', serverID, serverID]);
     });
 
     const handler = (state, next, payload, evt) => {
@@ -34,6 +37,6 @@ module.exports = (engine, config) => {
     //this is important, as to make sure evtTables doesn't interfere with serverInit
     process.nextTick(() => {
         engine.onM(['*', '*', '*'], handler);
-        engine.onM(['*', '*', '*', config.pathMarker, '**'], handler);
+        engine.onM(['*', '*', '*', pathMarker, '**'], handler);
     });
 };

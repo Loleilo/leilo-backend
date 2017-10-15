@@ -2,13 +2,15 @@ const sio = require('socket.io');
 const isValidLogin = require("./user.js").isValidLogin;
 const Sandbox = require('./sandbox').Sandbox;
 const JSON = require('circular-json');
-const toArr = require("../pathed.js").toArr;
+const toArr = require("../../pathed.js").toArr;
+const consts = require('../../consts');
+const serverID = consts.serverID;
+const pathMarker = consts.pathMarker;
 
 let globalConnectionID = 0;
 
 //handles a client websocket connection
 module.exports = (engine, config) => {
-    const serverID = config.serverID;
 
     engine.on(['serverInit', serverID, serverID], () => {
         const state = engine.state;
@@ -17,7 +19,7 @@ module.exports = (engine, config) => {
         wss.on('connection', (ws) => {
             globalConnectionID++;
             const currConnectionID = "connection#" + globalConnectionID;
-            ws.send(`tryAuth ${config.serverVersion}`);
+            ws.send(`tryAuth ${consts.serverVersion}`);
 
             ws.once('disconnect', () => engine.emit(['clientDisconnected', currConnectionID, currConnectionID]));
 
@@ -57,7 +59,7 @@ module.exports = (engine, config) => {
                         clientSandbox = new Sandbox(engine, currClientID);
                         state.sandboxes[currClientID] = clientSandbox;
                         //cleanup
-                        engine.emitNext(['gc', serverID, serverID, config.pathMarker, 'sandboxes', currClientID],
+                        engine.emitNext(['gc', serverID, serverID, pathMarker, 'sandboxes', currClientID],
                             [['serverExit', serverID, serverID],
                                 ['userDeleted', serverID, currClientID],]);
                     } else clientSandbox = state.sandboxes[currClientID];

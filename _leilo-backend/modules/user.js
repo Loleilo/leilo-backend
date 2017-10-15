@@ -1,11 +1,11 @@
 const PasswordHash = require('password-hash');
 const d = require('../util').getDefault;
+const consts=require('../../consts');
+const serverID = consts.serverID;
+const PERMS = consts.permsEngineOptions.permsModule.PERMS;
+const USER_LEVEL = consts.permsEngineOptions.USER_LEVEL;
 
 module.exports.middleware = (engine, config) => {
-    const serverID = config.serverID;
-    const PERMS = config.permsEngineOptions.permsModule.PERMS;
-    const USER_LEVEL = config.permsEngineOptions.USER_LEVEL;
-
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
         state.passwordHashes = d(state.passwordHashes, config.defaultPasswordHashes);
         state.users = d(state.users, {});

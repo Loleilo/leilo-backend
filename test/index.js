@@ -1,7 +1,7 @@
 const sioc = require('socket.io-client');
-const funcOr = require("../util.js").funcOr;
-const waitAll = require("../util.js").funcAnd;
-const serverID = require("../defaultConfig.js").sharedConsts.serverID;
+const funcOr = require("../_leilo-backend/util.js").funcOr;
+const waitAll = require("../_leilo-backend/util.js").funcAnd;
+const serverID = require("../consts").serverID;
 const fs = require('fs');
 require('colors');
 require('../index')();

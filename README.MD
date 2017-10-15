@@ -1,18 +1,5 @@
 # docs rough copy
 
-## config.js
-
-This file stores config for server. These are the options:
-
- - serverID: the ID to use in communicating server events
- - serverDefaultPassword: default password used to log in as "root", or as the server itself
- - saveLocation: location in which to save server data
- - saveInterval: amount of millis to wait between autosaves, set to -1 for no autosave
- - maxScriptTimeout: the max amount a time a script can be allowed to run
- - globalSandboxOptions - options for script sandbox
-     - forceSrc: whether to force sandboxed stuff to use the evt.src as sender
-     - forceDst: force sandboxed stuff to use evt.src as sender
-
 ## list of modules/events
 
 ### gc

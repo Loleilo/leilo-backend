@@ -1,5 +1,5 @@
 const JSON = require('circular-json');
-const pathMarker = require("../defaultConfig.js").sharedConsts.pathMarker;
+const pathMarker = require("../../consts").pathMarker;
 require('longjohn');
 require('colors');
 module.exports = (engine, config) => {

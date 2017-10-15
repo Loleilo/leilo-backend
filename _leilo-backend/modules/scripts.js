@@ -2,13 +2,15 @@ const Sandbox = require("./sandbox.js").Sandbox;
 const d = require('../util').getDefault;
 const {VM} = require('vm2');
 const uuid4 = require('uuid/v4');
-const toArr = require("../pathed.js").toArr;
+const toArr = require("../../pathed.js").toArr;
 const PermissionError = require("obj-perms-engine").PermissionError;
+const consts = require('../../consts');
+const serverID = consts.serverID;
+const PERMS = consts.permsEngineOptions.permsModule.PERMS;
+const USER_LEVEL = consts.permsEngineOptions.USER_LEVEL;
+const pathMarker = consts.pathMarker;
 
 module.exports = (engine, config) => {
-    const serverID = config.serverID;
-    const PERMS = config.permsEngineOptions.permsModule.PERMS;
-    const USER_LEVEL = config.permsEngineOptions.USER_LEVEL;
 
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
         //for each user
@@ -110,12 +112,12 @@ module.exports = (engine, config) => {
                     ans = 'accept';
 
                 //tell script that request has beeen accepted
-                engine.emitNext(['requestResponse', serverID, scriptInstanceID, config.pathMarker, reqID], ans);
+                engine.emitNext(['requestResponse', serverID, scriptInstanceID, pathMarker, reqID], ans);
             }
         });
 
         //setup event for script to request an evt to be send as parent user
-        engine.on(['requestElevated', scriptInstanceID, serverID, config.pathMarker, '*'], (payload, evt) => {
+        engine.on(['requestElevated', scriptInstanceID, serverID, pathMarker, '*'], (payload, evt) => {
             //update request queue
             engine.emit(toArr({
                 name: 'update',
@@ -130,7 +132,7 @@ module.exports = (engine, config) => {
             });
 
             //also emit actual evt
-            engine.emit(['requestElevated', scriptInstanceID, info.parentID, config.pathMarker, ...evt.path], payload);
+            engine.emit(['requestElevated', scriptInstanceID, info.parentID, pathMarker, ...evt.path], payload);
         });
 
         //choose which code to run

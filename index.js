@@ -1,9 +1,9 @@
-const defaultConfig = require('./defaultConfig');
+const defaultConfig = require('./_leilo-backend/defaultConfig');
 
-const util = require("./util.js");
+const util = require("./_leilo-backend/util.js");
 const funcOr = util.funcOr;
 
-const load = require('./loader');
+const load = require('./_leilo-backend/loader');
 
 //main modules
 module.exports = (config = {}) => {

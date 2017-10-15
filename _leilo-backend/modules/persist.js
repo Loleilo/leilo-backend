@@ -1,9 +1,10 @@
 const fs = require('fs');
 const JSON = require('circular-json');
 const semver = require('semver');
+const consts = require('../../consts');
+const serverID = consts.serverID;
 
 module.exports = (engine, config) => {
-    const serverID = config.serverID;
 
     //must run first
     engine.onM(['serverInit', serverID, serverID], (state, next, paylod, evt) => {

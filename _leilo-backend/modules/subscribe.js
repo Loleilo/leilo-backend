@@ -2,6 +2,10 @@
 // This is needed because CRUD events are only sent to the server unless sender specifies otherwise
 
 const PermissionError = require('obj-perms-engine').PermissionError;
+const consts = require('../../consts');
+const serverID = consts.serverID;
+const PERMS = consts.permsEngineOptions.permsModule.PERMS;
+const pathMarker = consts.pathMarker;
 
 //payload may contain an array in evt as the list of operations to redirect
 const defaultPayload = {
@@ -10,8 +14,6 @@ const defaultPayload = {
 };
 
 module.exports = (engine, config) => {
-    const serverID = config.serverID;
-    const PERMS = config.permsEngineOptions.permsModule.PERMS;
 
     //todo prevent duplicate subscribes
     // allows a client to subscribe to state change events if they have read perms
@@ -43,19 +45,19 @@ module.exports = (engine, config) => {
         for (let i = 0; i < evtNames.length; i++) {
             //listener remaps event to send to subscriber
             const listener = (payloadInner, evtInner) => {
-                engine.emit([evtInner.name, evtInner.src, evt.src, config.pathMarker, ...evtInner.path], payloadInner);
+                engine.emit([evtInner.name, evtInner.src, evt.src, pathMarker, ...evtInner.path], payloadInner);
             };
-            engine.on([evtNames[i], evtSrc, serverID, config.pathMarker, ...payload.path], listener);
+            engine.on([evtNames[i], evtSrc, serverID, pathMarker, ...payload.path], listener);
         }
 
         //init subscriber
-        engine.emit(['subscribeSync', evt.src, serverID, config.pathMarker, ...actualPath]);
+        engine.emit(['subscribeSync', evt.src, serverID, pathMarker, ...actualPath]);
     });
 
     //event is used to initially load the state into client
-    engine.on(['subscribeSync', '*', serverID, config.pathMarker, '**'], (payload, evt) => {
+    engine.on(['subscribeSync', '*', serverID, pathMarker, '**'], (payload, evt) => {
         const state = engine.state;
-        engine.emit(['update', serverID, evt.src, config.pathMarker, ...evt.path], {
+        engine.emit(['update', serverID, evt.src, pathMarker, ...evt.path], {
             value: state.read(evt.src, state, evt.path)
         });
     });
@@ -73,6 +75,6 @@ module.exports = (engine, config) => {
 
         //go through every event name listed
         for (let i = 0; i < evtNames.length; i++)
-            engine.removeAllListeners([evtNames[i], evtSrc, serverID, config.pathMarker, ...payload.path]);
+            engine.removeAllListeners([evtNames[i], evtSrc, serverID, pathMarker, ...payload.path]);
     });
 };

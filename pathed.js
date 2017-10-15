@@ -1,5 +1,5 @@
-const pathMarker = require('./defaultConfig').sharedConsts.pathMarker;
-let d = require('./util').getDefault;
+const pathMarker = require('./consts').pathMarker;
+let d = require('./_leilo-backend/util').getDefault;
 
 module.exports.evtType = (evt) => {
     if (Array.isArray(evt)) {

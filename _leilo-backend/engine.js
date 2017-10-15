@@ -2,8 +2,8 @@
 const EventEmitter2 = require('eventemitter2').EventEmitter2;
 const EventEmitterChain2 = require('eventemitterchain2').EventEmitterChain2;
 const abind = require('auto-bind');
-const pathed = require('./pathed');
-const consts = require('./defaultConfig').sharedConsts;
+const pathed = require('../pathed');
+const consts = require('../consts');
 const serverID = consts.serverID;
 
 //Handles state change events and allows for middleware (aka functions that may modify events as they are passed down)

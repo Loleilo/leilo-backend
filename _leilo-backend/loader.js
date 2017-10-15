@@ -9,9 +9,8 @@ const d = util.getDefault;
 module.exports = (config = {}) => {
 
     //todo move default logic out of this module
-    let localConsts = Object.assign(defaultConfig.sharedConsts, defaultConfig.localConsts);
     let serverConfig = Object.assign({}, defaultConfig.localConfig, d(config.localConfig, {}));
-    let globalConfig = Object.assign({}, localConsts, serverConfig);
+    let globalConfig = Object.assign({}, serverConfig);
 
     let modules = merge({}, defaultConfig.modules, config.modules);
     let moduleOrder = d(config.moduleOrder, defaultConfig.moduleOrder);
@@ -44,7 +43,6 @@ module.exports = (config = {}) => {
 
     return {
         engine: engine,
-        sharedConfig: localConsts,
         localConfig: serverConfig,
         globalConfig: globalConfig,
         modules: modules,

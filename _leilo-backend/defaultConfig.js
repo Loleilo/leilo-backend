@@ -1,30 +1,6 @@
-const perms = require('obj-perms-engine').NVEOPerms;
-const version = require('./package.json').version;
-const match = require('./evtTablesMatch');
+const match = require('../evtTablesMatch');
 
 module.exports = {
-
-    //client-server shared constants
-
-    sharedConsts: {
-        serverID: "leilo", //username of server
-
-        pathMarker: 'path',//indicator of path in event array
-
-        permsEngineOptions: {
-            USER_LEVEL: {
-                ROOT: 0,
-                USER: 1,
-                PRGM: 2,
-            },
-            WILDCARD: '*',
-            permsModule: perms,
-        },
-    },
-
-    localConsts: {
-        serverVersion: version, //gives program easy access to current package serverVersion
-    },
 
     //server only config
 

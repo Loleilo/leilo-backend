@@ -21,8 +21,7 @@
     "semver": "^5.4.1",
     "socket.io": "^2.0.3",
     "uuid": "latest",
-    "vm2": "latest",
-    "ws": "latest"
+    "vm2": "latest"
   },
   "devDependencies": {
     "colors": "latest",
