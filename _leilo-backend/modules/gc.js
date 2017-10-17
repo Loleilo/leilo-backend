@@ -7,7 +7,7 @@ const USER_LEVEL = consts.permsEngineOptions.USER_LEVEL;
 
 module.exports = (engine, config) => {
 
-    //todo allow obj
+    //todo gc should be serializable
     engine.on(['gc', '*', serverID, consts.pathMarker, '**'], (payload, evt) => {
         const state = engine.state;
 

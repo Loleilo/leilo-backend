@@ -22,7 +22,7 @@ module.exports = (engine, config) => {
             for (const script in user.scripts) {
                 if (!user.scripts.hasOwnProperty(script)) continue;
                 user.scripts[script].running = false;
-                engine.emitNext(['scriptStart', serverID, serverID], {
+                engine.emitNext(['scriptStart', username, serverID], {
                     scriptInstanceID: script
                 });
             }
@@ -150,8 +150,11 @@ module.exports = (engine, config) => {
             engine.once(['initDone', scriptInstanceID, serverID], () => {
                 info.needInit = false;
                 engine.emit(['scriptInitDone', scriptInstanceID, info.parentID]);
+                engine.emit(['run', serverID, scriptInstanceID]);
             });
             engine.emit(['initRun', serverID, scriptInstanceID]);
+        }else{
+            engine.emit(['run', serverID, scriptInstanceID]);
         }
     });
 

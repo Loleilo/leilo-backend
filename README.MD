@@ -106,22 +106,23 @@ deleteUser - deletes sending user
 # stuff for me
 
 ## todo
+ 1. think about script access
  1. add updatePerms to tests
- 1. extract core functionality to another package
- 1. make option for server to send events back to client that client has send
-     - allows pessimistic mode
  1. refactor everything to use gc
+ 1. make gc serializable
  1. use once whenever possible (save number of listeners)
  1. make scripts named instead of uuid, rename scriptInstatiated
  1. allow root users to change password of user, delete user, etc
  1. separate auth from connection
+ 1. extract core functionality to another package
+ 1. make option for server to send events back to client that client has send
+     - allows pessimistic mode
  4. security
       - Parameter checking system
       - use typescript
  1. consider using promises
- 1. Create documentation
+ 1. Create legit documentation
  1. optimize ws usage/ number of events that are sent
- 1. make obj events universal (aka no converting except in engine) <-- cancer
  
 ## sandbox
    - server script can register callbacks to part of object tree
