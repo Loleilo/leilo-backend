@@ -26,6 +26,10 @@ update, pathed - updates obj at path
  
 delete, pathed - deletes obj at path
 
+updatePerms, path - changes perms of object
+ - user - user id to change perms for
+ - perms - the perms object to change to
+
 ### persist
 
 allows server state to persist even when server is stopped
@@ -102,6 +106,7 @@ deleteUser - deletes sending user
 # stuff for me
 
 ## todo
+ 1. add updatePerms to tests
  1. extract core functionality to another package
  1. make option for server to send events back to client that client has send
      - allows pessimistic mode
@@ -109,6 +114,7 @@ deleteUser - deletes sending user
  1. use once whenever possible (save number of listeners)
  1. make scripts named instead of uuid, rename scriptInstatiated
  1. allow root users to change password of user, delete user, etc
+ 1. separate auth from connection
  4. security
       - Parameter checking system
       - use typescript
