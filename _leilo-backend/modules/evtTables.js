@@ -18,18 +18,29 @@ module.exports = (engine, config) => {
             return;
         }
 
+        //loop through each rule
         for (let i = 0; i < state.evtRules.length; i++) {
             const evtRule = state.evtRules[i];
+
+            //run match
             const res = evtRule.match(evt, payload, state);
+
+            //if match returns non null
             if (res) {
+                //action determines what to do on match
                 let action = evtRule.action;
-                if (Array.isArray(action))
+
+                //modify event
+                if (action === 'redirect')
+                    return engine.emit(res);
+
+                //use result from match as action
+                if (action === 'action')
                     action = res;
-                if (action === 'accept') {
-                    next(state);
-                    return;
-                }
-                if (action === 'reject')return;
+
+                if (action === 'accept')
+                    return next(state);
+                else if (action === 'reject') return;
             }
         }
     };

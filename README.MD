@@ -106,14 +106,15 @@ deleteUser - deletes sending user
 # stuff for me
 
 ## todo
+ 1. separate auth from connection
+    - everything that is not persistent should be limited to the connection (subscribe)
  1. think about script access
  1. add updatePerms to tests
  1. refactor everything to use gc
  1. make gc serializable
  1. use once whenever possible (save number of listeners)
- 1. make scripts named instead of uuid, rename scriptInstatiated
+ 1. make scripts named instead of uuid, rename scriptInstantiated
  1. allow root users to change password of user, delete user, etc
- 1. separate auth from connection
  1. extract core functionality to another package
  1. make option for server to send events back to client that client has send
      - allows pessimistic mode
