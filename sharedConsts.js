@@ -10,6 +10,7 @@ module.exports = {
             ROOT: 0,
             USER: 1,
             PRGM: 2,
+            CONN: 3,
         },
         WILDCARD: '*',
         permsModule: perms,

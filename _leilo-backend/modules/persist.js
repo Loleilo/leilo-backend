@@ -14,13 +14,13 @@ module.exports = (engine, config) => {
                 obj = JSON.parse(obj);
             } catch (err) {
                 engine.emitNext(['warning', serverID, serverID], {err: err, srcEvt: evt});
-                obj = undefined;
+                obj = {};
             }
             if (obj.version && !semver.satisfies(obj.version, config.persistVersionRequirements)) {
                 engine.emit(['error', serverID, serverID], {
                     err: new Error('Save file serverVersion mismatch')
                 });
-                obj = undefined;
+                obj = {};
             }
             if (config.saveInterval > 0)
                 obj.saveTimer = setInterval(() => engine.emit(['saveServerState', serverID, serverID]), config.saveInterval);

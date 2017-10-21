@@ -5,6 +5,7 @@ require('colors');
 module.exports = (engine, config) => {
     const debugLevel = config.debugLevel;
     const debugHandler = (state, next, payload, evt) => {
+        // if(evt.name==='proxy')return next(state);
         const color = evt.name === 'error' || evt.name === 'warning' ? 'red' : 'yellow';
         if (debugLevel === 'short') {
             console.log(("Event occurred:" + evt.name

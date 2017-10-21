@@ -5,7 +5,7 @@ const serverID = consts.serverID;
 const PERMS = consts.permsEngineOptions.permsModule.PERMS;
 const USER_LEVEL = consts.permsEngineOptions.USER_LEVEL;
 
-module.exports.middleware = (engine, config) => {
+module.exports = (engine, config) => {
     engine.onM(['serverInit', serverID, serverID], (state, next) => {
         state.passwordHashes = d(state.passwordHashes, config.defaultPasswordHashes);
         state.users = d(state.users, {});
@@ -44,12 +44,13 @@ module.exports.middleware = (engine, config) => {
         engine.emit(['userDeleted', serverID, evt.src]);
         engine.emitNext(['forceDisconnect', serverID, evt.src]);
     });
-};
 
-module.exports.isValidLogin = (state, credentials) => {
-    const username = credentials.username;
-    if (state.passwordHashes[username])
-        if (PasswordHash.verify(credentials.password, state.passwordHashes[username].passwordHash))
-            return true;
-    return false;
+    engine.on(['auth', '*', serverID], (payload, evt)=>{
+        const username = payload.username;
+        if (engine.state.passwordHashes[username])
+            if (PasswordHash.verify(payload.password, engine.state.passwordHashes[username].passwordHash))
+                return engine.emit({name:'authSuccess', src: serverID, dst:evt.src}, username);
+
+        engine.emit({name:'authRejected', src: serverID, dst:evt.src});
+    });
 };

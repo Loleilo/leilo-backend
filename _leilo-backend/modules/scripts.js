@@ -1,4 +1,3 @@
-const Sandbox = require("./sandbox.js").Sandbox;
 const d = require('../util').getDefault;
 const {VM} = require('vm2');
 const uuid4 = require('uuid/v4');
@@ -52,25 +51,8 @@ module.exports = (engine, config) => {
         }
         info.running = true;
 
-        //create script sandbox
-        const sandbox = new Sandbox(engine, scriptInstanceID,
-            Object.assign({}, //base object
-                info.sandboxOptions, //user given options
-                config.globalSandboxOptions)); //global options
 
-        //create script vm to run script in
-        const vm = new VM(Object.assign({},
-            payload.vmOptions, //user given options
-            {
-                //timeout allowed for script
-                timeout: Math.min(config.maxScriptTimeout, d(info.scriptTimeout, config.maxScriptTimeout)),
-                sandbox: Object.assign({
-                    scriptID: scriptInstanceID, //give script id
-                }, sandbox.interface), //give actual sandbox
-            },
-            config.globalVMOptions));
-
-        //detect when user accepts
+        //detect when user accepts a request
         engine.on(['requestAccepted', info.parentID, scriptInstanceID], (payload) => {
             let lst = payload.responseLst;
 
@@ -105,7 +87,9 @@ module.exports = (engine, config) => {
                 lst = lst.slice(1);
 
                 if (ans === 'accept')
-                    state.sandboxes[info.parentID].interface.emit(req.evt, req.payload);
+                    engine.emit({name: 'proxy', src: info.parentID, dst: serverID}, engine =>
+                        engine.emit(req.evt, req.payload)
+                    );
 
                 //allow user to fake accept
                 if (ans === 'skip')
@@ -119,12 +103,12 @@ module.exports = (engine, config) => {
         //setup event for script to request an evt to be send as parent user
         engine.on(['requestElevated', scriptInstanceID, serverID, pathMarker, '*'], (payload, evt) => {
             //update request queue
-            engine.emit(toArr({
+            engine.emit({
                 name: 'update',
                 src: serverID,
                 dst: serverID,
                 path: ['users', info.parentID, 'scripts', scriptInstanceID, 'requestQueue']
-            }), {
+            }, {
                 value: info.requestQueue.concat([{
                     request: payload,
                     reqID: evt.path[0]
@@ -135,27 +119,50 @@ module.exports = (engine, config) => {
             engine.emit(['requestElevated', scriptInstanceID, info.parentID, pathMarker, ...evt.path], payload);
         });
 
-        //choose which code to run
-        let code;
-        if (info.runFromPath)
-            code = state.read(info.parentID, state, info.scriptPath);
-        else
-            code = info.scriptCode;
+        engine.emit({name: 'proxy', src: scriptInstanceID, dst: serverID}, sandboxedEngine => {
+            //create script vm to run script in
+            const vm = new VM(Object.assign({},
+                payload.vmOptions, //user given options
 
-        vm.run(code); //actually run code
+                //instance options
+                {
+                    //timeout allowed for script
+                    timeout: Math.min(config.maxScriptTimeout, d(info.scriptTimeout, config.maxScriptTimeout)),
 
-        //if first run of script, call script init func
-        if (info.needInit) {
-            // script should emit init_done when setup is done
-            engine.once(['initDone', scriptInstanceID, serverID], () => {
-                info.needInit = false;
-                engine.emit(['scriptInitDone', scriptInstanceID, info.parentID]);
+                    //objects script will be able to access
+                    sandbox: Object.assign(
+                        {
+                            scriptID: scriptInstanceID, //give script id
+                        },
+                        sandboxedEngine
+                    ),
+                },
+
+                config.globalVMOptions //global options
+            ));
+
+            //choose which code to run
+            let code;
+            if (info.runFromPath)
+                code = state.read(info.parentID, state, info.scriptPath);
+            else
+                code = info.scriptCode;
+
+            vm.run(code); //actually run code
+
+            //if first run of script, call script init func
+            if (info.needInit) {
+                // script should emit init_done when setup is done
+                engine.once(['initDone', scriptInstanceID, serverID], () => {
+                    info.needInit = false;
+                    engine.emit(['scriptInitDone', scriptInstanceID, info.parentID]);
+                    engine.emit(['run', serverID, scriptInstanceID]);
+                });
+                engine.emit(['initRun', serverID, scriptInstanceID]);
+            } else {
                 engine.emit(['run', serverID, scriptInstanceID]);
-            });
-            engine.emit(['initRun', serverID, scriptInstanceID]);
-        }else{
-            engine.emit(['run', serverID, scriptInstanceID]);
-        }
+            }
+        });
     });
 
     //creates a script instance

@@ -40,13 +40,13 @@ class Engine extends EventEmitter2 {
             } catch (err) {
                 this.emit(['error', serverID, evt.src], {
                     err: err,
-                    srcEvent: evt
+                    srcEvent: {evt:evt,payload:payload}
                 });
             }
         };
     }
 
-    _checkInvalid(evt, defaultParams = this.config.engine.defaultEvt) {
+    checkInvalid(evt, defaultParams = this.config.engine.defaultEvt) {
         if (pathed.evtType(evt) === 'invalid') {
             this.emit(['error', serverID, serverID], {
                 err: new Error('Invalid event'),
@@ -66,35 +66,45 @@ class Engine extends EventEmitter2 {
 
     //registers a callback into the middleware chain
     onM(evt, callback) {
-        evt = this._checkInvalid(evt);
+        evt = this.checkInvalid(evt);
         this.pendingEmitter.on(evt, this._createHandler(callback))
     };
 
     onceM(evt, callback) {
-        evt = this._checkInvalid(evt);
+        evt = this.checkInvalid(evt);
         this.pendingEmitter.once(evt, this._createHandler(callback))
     }
 
     on(evt, ...args) {
-        evt = this._checkInvalid(evt);
+        evt = this.checkInvalid(evt);
         super.on(evt, ...args);
     }
 
     once(evt, ...args) {
-        evt = this._checkInvalid(evt);
+        evt = this.checkInvalid(evt);
         super.once(evt, ...args);
     }
 
     emit(evt, payload, callback) {
         //ignore internal events
         if (evt === 'newListener' || evt === 'removeListener')return;
-        evt = this._checkInvalid(evt, this.config.engine.emitDefaultEvt);
+        evt = this.checkInvalid(evt, this.config.engine.emitDefaultEvt);
 
         this.pendingEmitter.emit(evt, payload, pathed.toObj(evt), callback);
     }
 
     emitNext(...args) {
         process.nextTick(() => this.emit(...args))
+    }
+
+    removeListener(evt, ...args){
+        evt = this.checkInvalid(evt);
+        super.removeListener(evt, ...args);
+    }
+
+    removeAllListeners(evt, ...args){
+        evt = this.checkInvalid(evt);
+        super.removeAllListeners(evt, ...args);
     }
 }
 

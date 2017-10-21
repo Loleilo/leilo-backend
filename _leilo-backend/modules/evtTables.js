@@ -7,20 +7,21 @@ const pathMarker = consts.pathMarker;
 
 module.exports = (engine, config) => {
 
-    engine.on(['serverInit', serverID, serverID], () => {
-        engine.state.evtRules = config.defaultEvtRules;
-        engine.emitNext(['gc', serverID, serverID, pathMarker, 'evtRules'], ['serverExit', serverID, serverID]);
+    let evtRules = config.rules;
+
+    engine.on({name: 'addRule', src: serverID, dst: serverID,}, (payload) => {
+        evtRules = [payload].concat(evtRules);
     });
 
     const handler = (state, next, payload, evt) => {
-        if (!state.evtRules) {
+        if (!evtRules) {
             next(state);
             return;
         }
 
         //loop through each rule
-        for (let i = 0; i < state.evtRules.length; i++) {
-            const evtRule = state.evtRules[i];
+        for (let i = 0; i < evtRules.length; i++) {
+            const evtRule = evtRules[i];
 
             //run match
             const res = evtRule.match(evt, payload, state);
@@ -38,8 +39,7 @@ module.exports = (engine, config) => {
                 if (action === 'action')
                     action = res;
 
-                if (action === 'accept')
-                    return next(state);
+                if (action === 'accept') return next(state);
                 else if (action === 'reject') return;
             }
         }

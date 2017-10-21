@@ -29,33 +29,34 @@ module.exports = {
     //module configs
 
     moduleOrder: [
-        "persist",
-        "evtTables",
+         "persist",
+        // "evtTables", todo this is useless right now
         "obj",
         "subscribe",
         "user",
         "scripts",
         "gc",
+        "sandbox",
         "wsConnector",
         "debug",
     ],
 
     modules: {
+        sandbox:{
+            __moduleName: 'sandbox'
+        },
+
         persist: {
             // enable: "PRODUCTION",
             __moduleName: "persist",
             saveLocation: `${__dirname}\\data\\state.json`, //where server state is stored on shutdown etc.
             saveInterval: -1,//amount of millis between autosave, -1 means don't autosave
-            persistVersionRequirements: ">=0.0.0",
+            persistVersionRequirements: ">1.6.1",
         },
 
         evtTables: {
             __moduleName: "evtTables",
-            defaultEvtRules: [
-                { //accept all root events
-                    action: 'accept',
-                    match: match.userLevel(match.ALL, 0)
-                },
+            rules: [
                 //accept all non handled events
                 {
                     action: 'accept',
@@ -73,10 +74,7 @@ module.exports = {
         },
 
         user: {
-            __moduleName: {
-                fileName: "user",
-                funcName: "middleware",
-            },
+            __moduleName: "user",
         },
 
         scripts: {
@@ -86,8 +84,6 @@ module.exports = {
             //forced global options for script sandboxes
             globalSandboxOptions: {
                 allowRemoveAllListeners: false,
-                forceSrc: true,
-                forceDst: true,
             },
 
             //forced global options for script VMs
